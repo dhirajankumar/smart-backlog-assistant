@@ -50,7 +50,7 @@ Feature directories are numbered sequentially: `specs/001-feature-name/`, `specs
 │       └── ...
 ├── docs/
 │   ├── spec/                           ← SDLC phase documents (human-readable narrative)
-│   │   ├── 00-constitution.md              ← project source of truth; updated on every phase change
+│   │   ├── 00-overview.md              ← project source of truth; updated on every phase change
 │   │   ├── 01-discovery.md
 │   │   ├── 02-architecture.md
 │   │   ├── 03-prototype.md
@@ -82,13 +82,13 @@ These rules are **mandatory**. Apply them automatically — do not wait to be as
 
 | Trigger | Required action |
 |---|---|
-| Creating or updating any file under `specs/` | Update `docs/spec/00-constitution.md` to reflect the change; update the relevant SDLC phase doc (`01`–`06`) if the content maps to a phase |
+| Creating or updating any file under `specs/` | Update `docs/spec/00-overview.md` to reflect the change; update the relevant SDLC phase doc (`01`–`06`) if the content maps to a phase |
 | Making or confirming an architectural decision during `/speckit-plan` | Create or update an ADR in `docs/decisions/ADR-NNN-<decision>.md` |
 | Writing or materially changing a prompt in any spec or plan | Reflect it in `docs/prompts/` |
 | Running `/speckit-constitution` | No doc update required; constitution is self-contained |
-| Running `/speckit-implement` | After completion, verify `docs/spec/00-constitution.md` still accurately reflects project state |
+| Running `/speckit-implement` | After completion, verify `docs/spec/00-overview.md` still accurately reflects project state |
 
-**`docs/spec/00-constitution.md` is the single source of truth for project status.** It MUST stay current. If it does not exist yet, create it when you first touch `docs/`.
+**`docs/spec/00-overview.md` is the single source of truth for project status.** It MUST stay current. If it does not exist yet, create it when you first touch `docs/`.
 
 **ADR naming**: `ADR-NNN-<kebab-case-decision-topic>.md`. Increment NNN from the highest existing ADR. Minimum ADR sections: `# ADR-NNN Title`, `## Status`, `## Context`, `## Decision`, `## Consequences`.
 
