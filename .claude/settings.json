@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$j = [Console]::In.ReadToEnd() | ConvertFrom-Json; $fp = $j.tool_input.file_path; if ($fp -match '[/\\\\]\\.specify[/\\\\]') { $name = [System.IO.Path]::GetFileNameWithoutExtension($fp); $branch = \"spec/$name\"; if (-not (git branch --list $branch)) { git branch $branch 2>$null } }",
+            "timeout": 10,
+            "statusMessage": "Creating spec branch..."
+          }
+        ]
+      }
+    ]
+  }
+}
