@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$j = [Console]::In.ReadToEnd() | ConvertFrom-Json; $fp = $j.tool_input.file_path; if ($fp -match '[/\\\\]\\.specify[/\\\\]') { $name = [System.IO.Path]::GetFileNameWithoutExtension($fp); $branch = \"spec/$name\"; if (-not (git branch --list $branch)) { git branch $branch 2>$null } }",
+            "timeout": 10,
+            "statusMessage": "Creating spec branch..."
+          },
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$j = [Console]::In.ReadToEnd() | ConvertFrom-Json; $fp = $j.tool_input.file_path; if ($fp -match '[/\\\\]specs[/\\\\]') { Write-Output 'DOC-SYNC: A file under specs/ was modified. Per CLAUDE.md Doc Sync Rules you MUST now: (1) update docs/spec/00-overview.md to reflect this change, and (2) update the relevant SDLC phase doc (docs/spec/01-06) if applicable. Do this before responding to the user.' }",
+            "timeout": 5,
+            "statusMessage": "Checking doc sync..."
+          }
+        ]
+      }
+    ]
+  }
+}

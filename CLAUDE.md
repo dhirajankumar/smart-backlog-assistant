@@ -27,17 +27,70 @@ Feature directories are numbered sequentially: `specs/001-feature-name/`, `specs
 
 ## Architecture
 
-### Spec-Kit Framework Layout
+### Project Structure
 
 ```
-.claude/skills/          # Skill definitions (SKILL.md per command)
-.specify/
-  templates/             # spec, plan, tasks, checklist, constitution templates
-  scripts/bash/          # Shared shell utilities (common.sh, check-prerequisites.sh, etc.)
-  workflows/speckit/     # workflow.yml orchestrating full lifecycle
-  integrations/          # claude.manifest.json, speckit.manifest.json
-  memory/constitution.md # Project principles and governance (currently template)
+/
+├── CLAUDE.md                           ← project instructions (this file)
+├── .specify/
+│   └── memory/
+│       └── constitution.md             ← architectural DNA; READ before every spec
+├── .claude/
+│   ├── settings.json                   ← hooks and permissions
+│   └── skills/                         ← skill definitions (SKILL.md per command)
+├── specs/                              ← one folder per feature/phase (Spec-Kit output)
+│   ├── phase-1-discovery/
+│   │   └── spec.md
+│   ├── phase-2-architecture/
+│   │   └── spec.md
+│   └── NNN-feature-name/               ← numbered sequentially for standalone features
+│       ├── spec.md
+│       ├── plan.md
+│       ├── tasks.md
+│       └── ...
+├── docs/
+│   ├── spec/                           ← SDLC phase documents (human-readable narrative)
+│   │   ├── 00-overview.md              ← project source of truth; updated on every phase change
+│   │   ├── 01-discovery.md
+│   │   ├── 02-architecture.md
+│   │   ├── 03-prototype.md
+│   │   ├── 04-build.md
+│   │   ├── 05-testing.md
+│   │   └── 06-release.md
+│   ├── decisions/                      ← Architecture Decision Records (ADRs)
+│   │   ├── ADR-001-model-choice.md
+│   │   ├── ADR-002-integration.md
+│   │   ├── ADR-003-data-residency.md
+│   │   └── ADR-004-auth.md
+│   └── prompts/                        ← prompt engineering artifacts
+│       ├── system-prompt-v1.md
+│       └── evaluation-cases.md
+├── src/                                ← application source code
+├── tests/                              ← test suites
+├── .specify/
+│   ├── templates/                      ← spec, plan, tasks, checklist, constitution templates
+│   ├── scripts/bash/                   ← shared shell utilities
+│   ├── workflows/speckit/              ← workflow.yml orchestrating full lifecycle
+│   └── integrations/                   ← claude.manifest.json, speckit.manifest.json
+└── .github/
+    └── workflows/                      ← CI/CD pipelines
 ```
+
+### Doc Sync Rules
+
+These rules are **mandatory**. Apply them automatically — do not wait to be asked.
+
+| Trigger | Required action |
+|---|---|
+| Creating or updating any file under `specs/` | Update `docs/spec/00-overview.md` to reflect the change; update the relevant SDLC phase doc (`01`–`06`) if the content maps to a phase |
+| Making or confirming an architectural decision during `/speckit-plan` | Create or update an ADR in `docs/decisions/ADR-NNN-<decision>.md` |
+| Writing or materially changing a prompt in any spec or plan | Reflect it in `docs/prompts/` |
+| Running `/speckit-constitution` | No doc update required; constitution is self-contained |
+| Running `/speckit-implement` | After completion, verify `docs/spec/00-overview.md` still accurately reflects project state |
+
+**`docs/spec/00-overview.md` is the single source of truth for project status.** It MUST stay current. If it does not exist yet, create it when you first touch `docs/`.
+
+**ADR naming**: `ADR-NNN-<kebab-case-decision-topic>.md`. Increment NNN from the highest existing ADR. Minimum ADR sections: `# ADR-NNN Title`, `## Status`, `## Context`, `## Decision`, `## Consequences`.
 
 ### Four-Phase Lifecycle
 
@@ -49,7 +102,7 @@ Feature directories are numbered sequentially: `specs/001-feature-name/`, `specs
 ### Key Design Constraints
 
 - Each user story in a spec must be independently testable as an MVP — tasks are organized per story to enable incremental deployment.
-- The **constitution** (`/.specify/memory/constitution.md`) defines non-negotiable project principles. Violations flagged during `/speckit-analyze` or `/speckit-plan` are CRITICAL and block progress until resolved.
+- The **constitution** (`.specify/memory/constitution.md`) defines non-negotiable project principles. Read it before writing any spec. Violations flagged during `/speckit-analyze` or `/speckit-plan` are CRITICAL and block progress until resolved.
 - Analysis results are capped at 50 findings; large artifact sets use progressive loading to stay token-efficient.
 
 ### Hook System
