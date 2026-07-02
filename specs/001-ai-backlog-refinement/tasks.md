@@ -21,9 +21,9 @@ and testing of each story. All four user stories (US1–US4) constitute MVP1.
 
 **Purpose**: Initialize Nx monorepo, install all dependencies, verify workspace compiles.
 
-- [ ] T001 Initialize Nx workspace with Angular 17 app (apps/web) and NestJS 10 app (apps/api) matching source tree in plan.md; create nx.json, tsconfig.base.json, root package.json
-- [ ] T002 [P] Add backend dependencies to root package.json: @anthropic-ai/sdk, pdf-parse, unpdf, class-validator, class-transformer, @nestjs/serve-static, @nestjs/config, @nestjs/platform-express, multer, uuid
-- [ ] T003 [P] Add frontend dependencies to root package.json: @angular/material@17, @angular/cdk@17, uuid; run npm install to confirm no version conflicts
+- [X] T001 Initialize Nx workspace with Angular 17 app (apps/web) and NestJS 10 app (apps/api) matching source tree in plan.md; create nx.json, tsconfig.base.json, root package.json
+- [X] T002 [P] Add backend dependencies to root package.json: @anthropic-ai/sdk, pdf-parse, unpdf, class-validator, class-transformer, @nestjs/serve-static, @nestjs/config, @nestjs/platform-express, multer, uuid
+- [X] T003 [P] Add frontend dependencies to root package.json: @angular/material@17, @angular/cdk@17, uuid; run npm install to confirm no version conflicts
 
 **Checkpoint**: `npx nx serve api` and `npx nx serve web` both start without errors
 
@@ -35,8 +35,8 @@ and testing of each story. All four user stories (US1–US4) constitute MVP1.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 [P] Create all enums in libs/shared/src/enums/: priority.enum.ts, confidence.enum.ts, status.enum.ts, overlap-flag.enum.ts, action-type.enum.ts, session-status.enum.ts, input-format.enum.ts (exact values from data-model.md)
-- [ ] T005 [P] Create constants in libs/shared/src/constants/: model.ts (MODEL_ID = 'claude-sonnet-4-6'), categories.ts (CATEGORIES array + Category type), limits.ts (MAX_PDF_SIZE_BYTES, MAX_WORD_COUNT, ANALYSIS_TIMEOUT_MS, ABORT_SIGNAL_MS, IMAGE_PDF_TEXT_THRESHOLD, OVERLAP_IOU_THRESHOLD, AI_TEMPERATURE)
+- [X] T004 [P] Create all enums in libs/shared/src/enums/: priority.enum.ts, confidence.enum.ts, status.enum.ts, overlap-flag.enum.ts, action-type.enum.ts, session-status.enum.ts, input-format.enum.ts (exact values from data-model.md)
+- [X] T005 [P] Create constants in libs/shared/src/constants/: model.ts (MODEL_ID = 'claude-sonnet-4-6'), categories.ts (CATEGORIES array + Category type), limits.ts (MAX_PDF_SIZE_BYTES, MAX_WORD_COUNT, ANALYSIS_TIMEOUT_MS, ABORT_SIGNAL_MS, IMAGE_PDF_TEXT_THRESHOLD, OVERLAP_IOU_THRESHOLD, AI_TEMPERATURE)
 - [ ] T006 Create all entity interfaces in libs/shared/src/entities/: input-document.entity.ts, existing-backlog-item.entity.ts, key-requirements-summary.entity.ts, user-story.entity.ts, task.entity.ts, review-action.entity.ts, published-backlog.entity.ts, session-state.entity.ts (exact shapes from data-model.md)
 - [ ] T007 Create libs/shared/src/index.ts barrel-exporting all enums, entities, and constants; update tsconfig.base.json path alias @smart-backlog/shared → libs/shared/src/index.ts
 - [ ] T008 Bootstrap NestJS app: create apps/api/src/main.ts (ValidationPipe globally, CORS, ConfigModule.forRoot), apps/api/src/app.module.ts (import AiModule, AnalyseModule, RegenerateModule, ExportModule, ServeStaticModule placeholder)
