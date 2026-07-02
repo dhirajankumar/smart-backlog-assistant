@@ -8,6 +8,7 @@
 
 ## Summary
 
+
 [Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context

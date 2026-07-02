@@ -1,7 +1,7 @@
 # Smart Backlog Assistant — Project Overview
 
 **Last Updated**: 2026-07-01
-**Current Phase**: Specification
+**Current Phase**: Architecture / Planning
 **Status**: In Progress
 
 ## What This Project Is
@@ -11,19 +11,37 @@ notes, and requirement documents to generate draft user stories and tasks. It us
 human-in-the-loop review workflow — reviewers approve, reject, amend, or provide feedback
 before any item is published to the backlog.
 
+**Target**: Portable Windows demo application (`backlog-assistant.exe`) built on Angular 17 +
+NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the client machine.
+
 ## Active Features
 
-| # | Feature | Status | Spec |
-|---|---------|--------|------|
-| 001 | AI-Backed Backlog Refinement — MVP1 | Spec updated (PDF input, priority/category output, key requirements summary) | [spec.md](../../specs/001-ai-backlog-refinement/spec.md) |
-| 002 | UI Results Display | Draft — Spec complete | [spec.md](../../specs/002-ui-results-display/spec.md) |
+| # | Feature | Status | Artifacts |
+|---|---------|--------|-----------|
+| 001 | AI-Backed Backlog Refinement — MVP1 | **Planning complete** — ready for `/speckit-tasks` | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
+| 002 | UI Results Display | Draft — Spec complete | [spec](../../specs/002-ui-results-display/spec.md) |
+
+## Approved Tech Stack (Feature 001)
+
+| Layer | Technology |
+|---|---|
+| Monorepo | Nx workspace |
+| Frontend | Angular 17 (standalone components) |
+| Backend | NestJS 10 |
+| Shared types | `libs/shared` (Nx library) |
+| AI SDK | Anthropic TypeScript SDK (`@anthropic-ai/sdk`) |
+| Session state | Angular `SessionService` + RxJS `BehaviorSubject` (in-memory) |
+| PDF parsing | `pdf-parse` + `unpdf` fallback |
+| UI components | Angular Material 17 |
+| Testing | Jest + Cypress |
+| Demo packaging | `pkg` → `backlog-assistant.exe` |
 
 ## SDLC Phase Documents
 
 | Phase | Document | Status |
 |-------|----------|--------|
 | 01 Discovery | [01-discovery.md](01-discovery.md) | Not started |
-| 02 Architecture | [02-architecture.md](02-architecture.md) | Not started |
+| 02 Architecture | [02-architecture.md](02-architecture.md) | **In progress** — Feature 001 plan approved |
 | 03 Prototype | [03-prototype.md](03-prototype.md) | Not started |
 | 04 Build | [04-build.md](04-build.md) | Not started |
 | 05 Testing | [05-testing.md](05-testing.md) | Not started |
@@ -31,7 +49,12 @@ before any item is published to the backlog.
 
 ## Architecture Decisions
 
-No ADRs recorded yet. ADRs will be created during `/speckit-plan`.
+| ADR | Decision | Status |
+|---|---|---|
+| [ADR-001](../../docs/decisions/ADR-001-angular-nestjs-nx.md) | Angular + NestJS Nx monorepo as the application stack | Accepted |
+| [ADR-002](../../docs/decisions/ADR-002-feature-modules-not-mfe.md) | Angular lazy-loaded feature modules instead of micro-frontends (MVP1) | Accepted |
+| [ADR-003](../../docs/decisions/ADR-003-model-pinning.md) | AI model pinning and prompt versioning policy | Accepted |
+| [ADR-004](../../docs/decisions/ADR-004-pdf-parse-library.md) | PDF parsing — pdf-parse with unpdf fallback | Accepted |
 
 ## Governance
 
