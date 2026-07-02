@@ -1,8 +1,8 @@
 # Smart Backlog Assistant — Project Overview
 
 **Last Updated**: 2026-07-02
-**Current Phase**: Tasks Generated (with unit tests) — Ready for Implementation
-**Status**: In Progress
+**Current Phase**: Implementation In Progress — Phase 1 (Setup) Complete
+**Status**: In Progress — Branch `feat/001-ai-backlog-refinement`
 
 ## What This Project Is
 
@@ -18,7 +18,7 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 
 | # | Feature | Status | Artifacts |
 |---|---------|--------|-----------|
-| 001 | AI-Backed Backlog Refinement — MVP1 | **Tasks generated** — ready for `/speckit-implement` | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [tasks](../../specs/001-ai-backlog-refinement/tasks.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
+| 001 | AI-Backed Backlog Refinement — MVP1 | **In Progress** — Phase 1 (Setup) complete; T001–T003 ✅ | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [tasks](../../specs/001-ai-backlog-refinement/tasks.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
 | 002 | UI Results Display | Draft — Spec complete | [spec](../../specs/002-ui-results-display/spec.md) |
 | 003 | MCP Integration and Custom Skills — MVP2 | **Tasks generated** — ready for `/speckit-implement` | [spec](../../specs/003-mcp-custom-skills/spec.md) · [tasks](../../specs/003-mcp-custom-skills/tasks.md) |
 
@@ -44,7 +44,7 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 | 01 Discovery | [01-discovery.md](01-discovery.md) | Not started |
 | 02 Architecture | [02-architecture.md](02-architecture.md) | **Complete** — Feature 001 plan + tasks approved |
 | 03 Prototype | [03-prototype.md](03-prototype.md) | Not started |
-| 04 Build | [04-build.md](04-build.md) | **Ready to start** — 54 tasks generated for Feature 001 (includes 13 unit test tasks) |
+| 04 Build | [04-build.md](04-build.md) | **In Progress** — Phase 1 complete (Nx workspace, Angular 17 + NestJS 10 scaffolded, all deps installed, builds verified) |
 | 05 Testing | [05-testing.md](05-testing.md) | Not started |
 | 06 Release | [06-release.md](06-release.md) | Not started |
 
