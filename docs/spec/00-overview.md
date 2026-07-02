@@ -20,6 +20,7 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 |---|---------|--------|-----------|
 | 001 | AI-Backed Backlog Refinement — MVP1 | **Planning complete** — ready for `/speckit-tasks` | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
 | 002 | UI Results Display | Draft — Spec complete | [spec](../../specs/002-ui-results-display/spec.md) |
+| 003 | MCP Integration and Custom Skills — MVP2 | **Tasks generated** — ready for `/speckit-implement` | [spec](../../specs/003-mcp-custom-skills/spec.md) · [tasks](../../specs/003-mcp-custom-skills/tasks.md) |
 
 ## Approved Tech Stack (Feature 001)
 
