@@ -2,6 +2,7 @@ export * from './constants/categories';
 export * from './constants/limits';
 export * from './constants/model';
 export * from './entities/existing-backlog-item.entity';
+export * from './entities/key-requirements-summary.entity';
 export * from './entities/user-story.entity';
 export * from './enums/action-type.enum';
 export * from './enums/confidence.enum';

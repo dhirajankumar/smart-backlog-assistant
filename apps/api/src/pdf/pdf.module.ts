@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { PdfService } from './pdf.service';
 
 @Module({
-  providers: [],
-  exports: [],
+  providers: [PdfService],
+  exports: [PdfService],
 })
 export class PdfModule {}
