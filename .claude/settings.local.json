@@ -4,7 +4,9 @@
       "Bash(git *)",
       "Bash(bash .specify/scripts/bash/setup-tasks.sh --json)",
       "Bash(bash .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
-      "Bash(npx nx *)"
+      "Bash(npx nx *)",
+      "Bash(dir *)",
+      "Bash(node *)"
     ]
   }
 }

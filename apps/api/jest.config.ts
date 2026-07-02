@@ -8,4 +8,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/api',
+  moduleNameMapper: {
+    '^@smart-backlog/shared$': '<rootDir>/../../libs/shared/src/index.ts',
+  },
 };
