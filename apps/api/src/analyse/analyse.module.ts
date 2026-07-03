@@ -5,6 +5,7 @@ import { LIMITS } from '@smart-backlog/shared';
 import { AiModule } from '../ai/ai.module';
 import { PdfModule } from '../pdf/pdf.module';
 import { OverlapModule } from '../overlap/overlap.module';
+import { AnalyseController } from './analyse.controller';
 import { AnalyseService } from './analyse.service';
 
 @Module({
@@ -19,6 +20,7 @@ import { AnalyseService } from './analyse.service';
     PdfModule,
     OverlapModule,
   ],
+  controllers: [AnalyseController],
   providers: [AnalyseService],
   exports: [AnalyseService],
 })

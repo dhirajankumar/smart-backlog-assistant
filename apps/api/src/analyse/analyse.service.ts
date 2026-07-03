@@ -10,6 +10,7 @@ import {
   OverlapFlag,
   Priority,
   Confidence,
+  Task,
   UserStory,
 } from '@smart-backlog/shared';
 
@@ -19,7 +20,7 @@ import { PdfError } from '../pdf/pdf.validator';
 import { OverlapService } from '../overlap/overlap.service';
 import { requirementsSummaryPrompt } from '../ai/prompts/requirements-summary.prompt';
 import { storyGenerationPrompt } from '../ai/prompts/story-generation.prompt';
-import { AnalyseDto } from './analyse.dto';
+import { AnalyseDto, AnalyseTasksDto } from './analyse.dto';
 
 @Injectable()
 export class AnalyseService {
@@ -192,6 +193,11 @@ export class AnalyseService {
         clearTimeout(timer);
       };
     });
+  }
+
+  async generateTasks(_dto: AnalyseTasksDto): Promise<Task[]> {
+    // Full implementation delivered in T030
+    return [];
   }
 
   private mapAiError(err: Error): object {
