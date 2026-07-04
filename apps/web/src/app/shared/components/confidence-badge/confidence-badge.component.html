@@ -1,0 +1,29 @@
+<span class="confidence-badge">
+  <mat-chip-set>
+    <mat-chip [class]="chipClass" [disableRipple]="true">
+      @if (confidence === Confidence.Low) {
+        <mat-icon matChipAvatar class="chip-icon">warning</mat-icon>
+      }
+      {{ confidence }}
+    </mat-chip>
+  </mat-chip-set>
+
+  @if (confidence === Confidence.Low && !hasAcknowledged) {
+    <button
+      mat-stroked-button
+      color="warn"
+      class="acknowledge-btn"
+      (click)="acknowledge()"
+    >
+      <mat-icon>warning_amber</mat-icon>
+      Acknowledge low confidence
+    </button>
+  }
+
+  @if (confidence === Confidence.Low && hasAcknowledged) {
+    <span class="acknowledged-label">
+      <mat-icon class="acknowledged-icon">check_circle</mat-icon>
+      Acknowledged
+    </span>
+  }
+</span>

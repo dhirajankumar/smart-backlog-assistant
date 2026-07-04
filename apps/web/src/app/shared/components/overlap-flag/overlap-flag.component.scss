@@ -1,0 +1,30 @@
+mat-chip-set {
+  display: inline-flex;
+}
+
+.overlap-chip {
+  font-size: 0.78rem;
+  cursor: default;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+  }
+
+  &--existing {
+    background-color: #fff3e0 !important;
+    color: #e65100 !important;
+  }
+
+  &--duplicate {
+    background-color: #e8eaf6 !important;
+    color: #3949ab !important;
+  }
+}
+
+.overlap-reference {
+  font-weight: 600;
+  margin-left: 2px;
+}

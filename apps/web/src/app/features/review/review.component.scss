@@ -1,0 +1,88 @@
+.review-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.review-header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #212121;
+  }
+}
+
+.review-summary-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.summary-chip {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  &--approved { background: #e8f5e9; color: #2e7d32; }
+  &--amended  { background: #fff8e1; color: #f57f17; }
+  &--rejected { background: #ffebee; color: #c62828; }
+  &--pending  { background: #e3f2fd; color: #1565c0; }
+}
+
+.requirements-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #424242;
+  }
+}
+
+.requirements-bullets {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  color: #424242;
+
+  li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+}
+
+.reviewer-note-field {
+  width: 100%;
+}
+
+.stories-section {
+  margin-bottom: 32px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #757575;
+  padding: 40px 0;
+  font-size: 1rem;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 0 24px;
+}
+
+.proceed-btn {
+  font-size: 1rem;
+  padding: 0 24px;
+  height: 44px;
+}

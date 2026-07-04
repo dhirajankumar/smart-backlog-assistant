@@ -1,0 +1,63 @@
+<div class="review-page">
+
+  <header class="review-header">
+    <h1>Review AI-Generated User Stories</h1>
+    @if (reviewSummary$ | async; as summary) {
+      <div class="review-summary-bar">
+        <span class="summary-chip summary-chip--approved">✓ {{ summary.approved }} Approved</span>
+        <span class="summary-chip summary-chip--amended">✎ {{ summary.amended }} Amended</span>
+        <span class="summary-chip summary-chip--rejected">✗ {{ summary.rejected }} Rejected</span>
+        <span class="summary-chip summary-chip--pending">⏳ {{ summary.pending }} Pending</span>
+      </div>
+    }
+  </header>
+
+  @if (requirementsSummary$ | async; as summary) {
+    <section class="requirements-section">
+      <h2>Key Requirements Summary</h2>
+      <ul class="requirements-bullets">
+        @for (bullet of summary.bullets; track bullet) {
+          <li>{{ bullet }}</li>
+        }
+      </ul>
+      <mat-form-field appearance="outline" class="reviewer-note-field">
+        <mat-label>Reviewer Note</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="reviewerNote"
+          (blur)="onReviewerNoteBlur()"
+          rows="3"
+          placeholder="Add your notes or context for the review team…"
+        ></textarea>
+      </mat-form-field>
+    </section>
+  }
+
+  <section class="stories-section">
+    @if (stories$ | async; as stories) {
+      @if (stories.length === 0) {
+        <p class="empty-state">No stories were generated. Return to the analysis page to try again.</p>
+      } @else {
+        @for (story of stories; track story.id) {
+          <app-story-card
+            [story]="story"
+            (approve)="onApprove($event)"
+            (reject)="onReject($event)"
+            (amend)="onAmend($event)"
+            (feedback)="onFeedback($event)"
+          />
+        }
+      }
+    }
+  </section>
+
+  <div class="review-footer">
+    @if (canPublish$ | async) {
+      <button mat-flat-button color="primary" class="proceed-btn" (click)="proceedToTasks()">
+        <mat-icon>arrow_forward</mat-icon>
+        Proceed to Tasks
+      </button>
+    }
+  </div>
+
+</div>

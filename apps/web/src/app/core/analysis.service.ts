@@ -50,7 +50,11 @@ export class AnalysisService {
     );
 
     this.currentStep$.next(null);
-    void this.streamSse('/api/analyse', formData, event => this.handleAnalysisEvent(event));
+    this.streamSse('/api/analyse', formData, event => this.handleAnalysisEvent(event))
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
+      });
   }
 
   regenerate(dto: RegenerateDto): void {
@@ -60,7 +64,11 @@ export class AnalysisService {
     body.append('feedback', dto.feedback);
     if (dto.parentStoryId) body.append('parentStoryId', dto.parentStoryId);
 
-    void this.streamSse('/api/regenerate', body, event => this.handleRegenerateEvent(event, dto));
+    this.streamSse('/api/regenerate', body, event => this.handleRegenerateEvent(event, dto))
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
+      });
   }
 
   private handleAnalysisEvent(event: AnalysisSseEvent): void {
@@ -101,8 +109,9 @@ export class AnalysisService {
     let response: Response;
     try {
       response = await fetch(url, { method: 'POST', body });
-    } catch {
-      this.session.setAnalysisError({ code: 'NETWORK_ERROR', message: 'Could not connect to the analysis service' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not connect to the analysis service';
+      this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
       return;
     }
 
@@ -111,23 +120,45 @@ export class AnalysisService {
       return;
     }
 
+    const contentType = response.headers.get('content-type') ?? '';
+    if (!contentType.includes('text/event-stream')) {
+      this.session.setAnalysisError({
+        code: 'HTTP_ERROR',
+        message: `Expected SSE stream but got ${contentType || 'unknown content type'} — is the API server running and the proxy configured?`,
+      });
+      return;
+    }
+
     const reader = response.body?.getReader();
-    if (!reader) return;
+    if (!reader) {
+      this.session.setAnalysisError({ code: 'NETWORK_ERROR', message: 'Response body is not readable' });
+      return;
+    }
 
     const decoder = new TextDecoder();
     let buffer = '';
+    let receivedAnyEvent = false;
 
     try {
       for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
+        let chunk: ReadableStreamReadResult<Uint8Array>;
+        try {
+          chunk = await reader.read();
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Stream read error';
+          this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
+          return;
+        }
+
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() ?? '';
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             try {
               const parsed = JSON.parse(line.slice(6)) as AnalysisSseEvent;
+              receivedAnyEvent = true;
               onEvent(parsed);
             } catch { /* skip malformed lines */ }
           }
@@ -135,6 +166,10 @@ export class AnalysisService {
       }
     } finally {
       reader.releaseLock();
+    }
+
+    if (!receivedAnyEvent) {
+      this.session.setAnalysisError({ code: 'NETWORK_ERROR', message: 'Analysis service returned an empty response' });
     }
   }
 }

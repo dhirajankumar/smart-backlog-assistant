@@ -12,4 +12,9 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./features/analysis/analysis.component').then(m => m.AnalysisComponent),
   },
+  {
+    path: 'review',
+    loadComponent: () =>
+      import('./features/review/review.component').then(m => m.ReviewComponent),
+  },
 ];

@@ -6,7 +6,9 @@
       "Bash(bash .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
       "Bash(npx nx *)",
       "Bash(dir *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "PowerShell(cmd /c \"C:\\\\Users\\\\dhiraj.an.kumar\\\\claude-workshop\\\\smart-backlog-assistant\\\\build-demo.bat\" 2>&1)",
+      "PowerShell(& cmd.exe /c \"`\"C:\\\\Users\\\\dhiraj.an.kumar\\\\claude-workshop\\\\smart-backlog-assistant\\\\build-demo.bat`\"\" 2>&1)"
     ]
   }
 }
