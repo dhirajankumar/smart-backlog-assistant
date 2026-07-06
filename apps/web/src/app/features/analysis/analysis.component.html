@@ -1,0 +1,99 @@
+@if (status$ | async; as status) {
+  <div class="analysis-page">
+
+    <!-- Progress indicator (shown while analysing) -->
+    @if (status === SessionStatus.Analysing) {
+      <section class="progress-section">
+        <h2>Analysing your requirements…</h2>
+        <ol class="step-list">
+          @for (step of steps; track step.id) {
+            <li
+              [ngClass]="{
+                'step-active': isActive(step.id),
+                'step-done': isCompleted(step.id) && !isActive(step.id)
+              }"
+            >
+              <span class="step-icon">
+                @if (isCompleted(step.id) && !isActive(step.id)) { ✓ }
+                @else if (isActive(step.id)) { ⟳ }
+                @else { ○ }
+              </span>
+              {{ step.label }}
+            </li>
+          }
+        </ol>
+      </section>
+    }
+
+    <!-- Error state -->
+    @if (status === SessionStatus.Error) {
+      <section class="error-section">
+        @if (analysisError$ | async; as error) {
+          <h2>Analysis failed</h2>
+          <p class="error-code">{{ error.code }}</p>
+          <p class="error-message">{{ error.message }}</p>
+          @if (error.code === 'AI_TIMEOUT') {
+            <p>The AI request timed out. You can retry with a shorter input or try again later.</p>
+          }
+          <button type="button" class="retry-btn" (click)="retry()">← Back to input</button>
+        }
+      </section>
+    }
+
+    <!-- Key Requirements Summary -->
+    @if (requirementsSummary$ | async; as summary) {
+      <section class="summary-section">
+        <h3>Key Requirements Summary</h3>
+        <ul>
+          @for (bullet of summary.bullets; track bullet) {
+            <li>{{ bullet }}</li>
+          }
+        </ul>
+        @if (summary.reviewerNote) {
+          <p class="reviewer-note"><strong>Reviewer note:</strong> {{ summary.reviewerNote }}</p>
+        }
+      </section>
+    }
+
+    <!-- Story cards streaming in -->
+    @if (stories$ | async; as stories) {
+      @if (stories.length > 0) {
+        <section class="stories-section">
+          <h3>Draft User Stories <span class="count">({{ stories.length }})</span></h3>
+          @for (story of stories; track story.id; let i = $index) {
+            <article class="story-card">
+              <header>
+                <span class="story-num">#{{ i + 1 }}</span>
+                <h4>{{ story.title }}</h4>
+                <span class="badge confidence-{{ story.confidence | lowercase }}">{{ story.confidence }}</span>
+                <span class="badge priority-{{ story.priority | lowercase }}">{{ story.priority }}</span>
+              </header>
+              <p><em>As a</em> {{ story.role }}, <em>I want</em> {{ story.benefit }}</p>
+              @if (story.overlapFlag !== 'none') {
+                <p class="overlap-flag">
+                  {{ story.overlapFlag === 'existing_overlap' ? 'Existing overlap' : 'Possible duplicate' }}
+                  @if (story.overlapReference) {
+                    : {{ story.overlapReference }}
+                  }
+                </p>
+              }
+              <details>
+                <summary>Acceptance criteria ({{ story.acceptanceCriteria.length }})</summary>
+                <ul>
+                  @for (ac of story.acceptanceCriteria; track ac) {
+                    <li>{{ ac }}</li>
+                  }
+                </ul>
+              </details>
+              <p class="rationale"><em>AI rationale:</em> {{ story.rationale }}</p>
+            </article>
+          }
+        </section>
+      } @else if (status === SessionStatus.Review) {
+        <p class="empty-message">No stories were extracted from the input. Please go back and try different content.</p>
+        <button type="button" class="retry-btn" (click)="retry()">← Back to input</button>
+      }
+    }
+
+  </div>
+}

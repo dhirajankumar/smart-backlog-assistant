@@ -1,0 +1,15 @@
+@if (isVisible) {
+  <mat-chip-set>
+    <mat-chip
+      [class]="'overlap-chip overlap-chip--' + (flag === OverlapFlag.ExistingOverlap ? 'existing' : 'duplicate')"
+      [highlighted]="true"
+      [disabled]="true"
+    >
+      <mat-icon>warning</mat-icon>
+      {{ label }}
+      @if (reference) {
+        <span class="overlap-reference">: {{ reference }}</span>
+      }
+    </mat-chip>
+  </mat-chip-set>
+}

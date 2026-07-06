@@ -1,0 +1,181 @@
+<mat-card class="story-card" [class]="'story-card--' + story.status.toLowerCase()">
+  <mat-card-header>
+    <div class="card-header">
+      <span class="status-badge" [class]="statusClass">{{ story.status }}</span>
+      @if (!isEditing) {
+        <h3 class="story-title">{{ story.title }}</h3>
+      }
+      <div class="header-meta">
+        <span class="priority-badge" [class]="priorityClass">{{ story.priority }}</span>
+        <span class="category-badge">{{ story.category }}</span>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="badge-row">
+      <app-confidence-badge
+        [confidence]="story.confidence"
+        (acknowledged)="onAcknowledged()"
+      />
+      <app-overlap-flag
+        [flag]="story.overlapFlag"
+        [reference]="story.overlapReference"
+      />
+    </div>
+
+    @if (!isEditing) {
+      <div class="story-body">
+        <div class="field-group">
+          <span class="field-label">Role</span>
+          <p class="field-value">{{ story.role }}</p>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Benefit</span>
+          <p class="field-value">{{ story.benefit }}</p>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Acceptance Criteria</span>
+          <ul class="criteria-list">
+            @for (criterion of story.acceptanceCriteria; track criterion) {
+              <li>{{ criterion }}</li>
+            }
+          </ul>
+        </div>
+        <div class="field-group">
+          <span class="field-label">AI Rationale</span>
+          <p class="field-value rationale">{{ story.rationale }}</p>
+        </div>
+        @if (story.status === ItemStatus.Amended && story.originalAiText) {
+          <details class="original-ai-section">
+            <summary>View original AI text</summary>
+            <div class="original-content">
+              <p><strong>Title:</strong> {{ story.originalAiText.title }}</p>
+              <p><strong>Role:</strong> {{ story.originalAiText.role }}</p>
+              <p><strong>Benefit:</strong> {{ story.originalAiText.benefit }}</p>
+            </div>
+          </details>
+        }
+      </div>
+    }
+
+    @if (isEditing) {
+      <div class="edit-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="editTitle" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role (As a…)</mat-label>
+          <input matInput [(ngModel)]="editRole" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Benefit (I want… so that…)</mat-label>
+          <textarea matInput [(ngModel)]="editBenefit" rows="2"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Acceptance Criteria (one per line)</mat-label>
+          <textarea matInput [(ngModel)]="editCriteriaText" rows="5"></textarea>
+        </mat-form-field>
+        <div class="edit-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Priority</mat-label>
+            <mat-select [(ngModel)]="editPriority">
+              @for (p of priorityOptions; track p) {
+                <mat-option [value]="p">{{ p }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select [(ngModel)]="editCategory">
+              @for (cat of CATEGORIES; track cat) {
+                <mat-option [value]="cat">{{ cat }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    }
+
+    @if (showReject) {
+      <div class="inline-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Reason for rejection (optional)</mat-label>
+          <input
+            matInput
+            [(ngModel)]="rejectReason"
+            placeholder="Why is this story being rejected?"
+          />
+        </mat-form-field>
+      </div>
+    }
+
+    @if (showFeedback) {
+      <div class="inline-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Feedback for regeneration</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="feedbackText"
+            rows="3"
+            placeholder="Describe what should be different in the regenerated story…"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="card-actions">
+    @if (!isEditing && !showReject && !showFeedback) {
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="!canApprove"
+        [title]="story.confidence === Confidence.Low && !lowConfidenceAcknowledged
+          ? 'Acknowledge low confidence before approving'
+          : ''"
+        (click)="onApprove()"
+      >
+        <mat-icon>check</mat-icon> Approve
+      </button>
+      <button mat-stroked-button (click)="toggleReject()">
+        <mat-icon>close</mat-icon> Reject
+      </button>
+      <button mat-stroked-button (click)="startEdit()">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-stroked-button (click)="toggleFeedback()">
+        <mat-icon>auto_fix_high</mat-icon> Feedback &amp; Regenerate
+      </button>
+    }
+
+    @if (isEditing) {
+      <button mat-flat-button color="primary" (click)="saveEdit()">
+        <mat-icon>save</mat-icon> Save
+      </button>
+      <button mat-stroked-button (click)="cancelEdit()">
+        <mat-icon>cancel</mat-icon> Cancel
+      </button>
+    }
+
+    @if (showReject) {
+      <button mat-flat-button color="warn" (click)="confirmReject()">
+        <mat-icon>delete_forever</mat-icon> Confirm Reject
+      </button>
+      <button mat-stroked-button (click)="toggleReject()">Cancel</button>
+    }
+
+    @if (showFeedback) {
+      <button
+        mat-flat-button
+        color="accent"
+        [disabled]="!feedbackText.trim()"
+        (click)="onRegenerate()"
+      >
+        <mat-icon>refresh</mat-icon> Regenerate
+      </button>
+      <button mat-stroked-button (click)="toggleFeedback()">Cancel</button>
+    }
+  </mat-card-actions>
+</mat-card>

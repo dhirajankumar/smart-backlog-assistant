@@ -14,7 +14,7 @@ and how to build the portable Windows demo executable.
 | Node.js | 20 LTS or later | Required for Nx + NestJS + Angular CLI |
 | npm | 10+ | Bundled with Node.js 20 |
 | Nx CLI | latest | `npm install -g nx` |
-| Anthropic API key | — | Set as `ANTHROPIC_API_KEY` environment variable |
+| Anthropic SSO | — | Run `ant auth login` once; org-provisioned credentials are picked up automatically |
 | pkg | latest | `npm install -g pkg` — required only for building the demo exe |
 
 **Windows demo machine** (client-facing): No prerequisites — the distributed
@@ -28,11 +28,13 @@ the exe.
 Create a `.env` file in the repo root (never commit this file):
 
 ```env
-ANTHROPIC_API_KEY=sk-ant-...
 PORT=3000
 ```
 
-NestJS reads these via `@nestjs/config` (`ConfigModule.forRoot()`). Angular reads `PORT`
+No Anthropic API key is required — the SDK auto-discovers credentials from your active SSO
+session (`ant auth login`) or from org-provisioned Workload Identity Federation env vars.
+
+NestJS reads `PORT` via `@nestjs/config` (`ConfigModule.forRoot()`). Angular reads it
 at build time via the Nx proxy config for local development.
 
 ---

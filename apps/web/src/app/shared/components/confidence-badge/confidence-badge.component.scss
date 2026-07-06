@@ -1,0 +1,59 @@
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+// Chip colour overrides — Angular Material chip uses background-color
+::ng-deep {
+  .chip-high {
+    --mdc-chip-elevated-container-color: #e8f5e9;
+    --mdc-chip-label-text-color: #2e7d32;
+  }
+
+  .chip-medium {
+    --mdc-chip-elevated-container-color: #fff8e1;
+    --mdc-chip-label-text-color: #f57f17;
+  }
+
+  .chip-low {
+    --mdc-chip-elevated-container-color: #ffebee;
+    --mdc-chip-label-text-color: #c62828;
+  }
+}
+
+.chip-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.acknowledge-btn {
+  font-size: 12px;
+  line-height: 28px;
+  height: 28px;
+  padding: 0 10px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+}
+
+.acknowledged-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #388e3c;
+}
+
+.acknowledged-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #388e3c;
+}

@@ -1,0 +1,73 @@
+<div class="input-page">
+  <h1>Smart Backlog Assistant</h1>
+  <p class="subtitle">Submit your requirements document to generate AI-backed user stories.</p>
+
+  <div class="mode-tabs">
+    <button
+      type="button"
+      [class.active]="inputMode === 'text'"
+      (click)="setMode('text')"
+    >Paste Text</button>
+    <button
+      type="button"
+      [class.active]="inputMode === 'pdf'"
+      (click)="setMode('pdf')"
+    >Upload PDF</button>
+  </div>
+
+  <form (ngSubmit)="onSubmit()">
+
+    @if (inputMode === 'text') {
+      <div class="form-group">
+        <label for="textContent">Requirements text</label>
+        <textarea
+          id="textContent"
+          name="textContent"
+          [(ngModel)]="textContent"
+          rows="12"
+          placeholder="Paste your requirements document here…"
+        ></textarea>
+      </div>
+    }
+
+    @if (inputMode === 'pdf') {
+      <div class="form-group">
+        <label for="pdfFile">PDF file <span class="hint">(max 10 MB, text-based)</span></label>
+        <input
+          id="pdfFile"
+          type="file"
+          accept=".pdf,application/pdf"
+          (change)="onPdfSelected($event)"
+        />
+        @if (pdfError) {
+          <p class="field-error">{{ pdfError }}</p>
+        }
+        @if (pdfFile) {
+          <p class="file-selected">Selected: {{ pdfFile.name }}</p>
+        }
+      </div>
+    }
+
+    <div class="form-group">
+      <label for="backlogJson">
+        Existing backlog JSON <span class="hint">(optional — array of objects with a "title" field)</span>
+      </label>
+      <input
+        id="backlogJson"
+        type="file"
+        accept=".json,application/json"
+        (change)="onBacklogSelected($event)"
+      />
+      @if (backlogFile) {
+        <p class="file-selected">Selected: {{ backlogFile.name }}</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="submit-btn"
+      [disabled]="!canSubmit"
+    >Analyse Requirements</button>
+
+  </form>
+</div>
