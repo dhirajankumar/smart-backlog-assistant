@@ -21,6 +21,7 @@ import { OverlapService } from '../overlap/overlap.service';
 import { requirementsSummaryPrompt } from '../ai/prompts/requirements-summary.prompt';
 import { storyGenerationPrompt } from '../ai/prompts/story-generation.prompt';
 import { AnalyseDto, AnalyseTasksDto } from './analyse.dto';
+import { AppLogger } from '../common/logger/app-logger.service';
 
 @Injectable()
 export class AnalyseService {
@@ -28,6 +29,7 @@ export class AnalyseService {
     private readonly aiService: AiService,
     private readonly pdfService: PdfService,
     private readonly overlapService: OverlapService,
+    private readonly logger: AppLogger,
   ) {}
 
   stream(
@@ -45,11 +47,13 @@ export class AnalyseService {
       (async () => {
         try {
           // Step 1: extract text
+          this.logger.log('Step: extracting_text', 'AnalyseService');
           emit({ type: 'progress', step: 'extracting_text' });
           let text: string;
 
           if (dto.inputType === 'pdf') {
             if (!pdfBuffer) {
+              this.logger.error('Step extracting_text failed: no PDF buffer', undefined, 'AnalyseService');
               emit({ type: 'error', payload: { code: 'PDF_EXTRACT_FAILED', message: 'No PDF file uploaded' } });
               subscriber.complete();
               return;
@@ -60,7 +64,15 @@ export class AnalyseService {
             text = dto.textContent ?? '';
           }
 
+          if (!text.trim()) {
+            this.logger.error('Step extracting_text failed: empty input', undefined, 'AnalyseService');
+            emit({ type: 'error', payload: { code: 'EMPTY_INPUT', message: 'No requirements could be extracted: the input document is empty' } });
+            subscriber.complete();
+            return;
+          }
+
           // Step 2: validate backlog JSON
+          this.logger.log('Step: validating_backlog', 'AnalyseService');
           emit({ type: 'progress', step: 'validating_backlog' });
           let existingItems: ExistingBacklogItem[] = [];
 
@@ -82,6 +94,7 @@ export class AnalyseService {
           }
 
           // Step 3: requirements summary
+          this.logger.log('Step: analysing_requirements', 'AnalyseService');
           emit({ type: 'progress', step: 'analysing_requirements' });
           let summaryText: string;
           try {
@@ -90,6 +103,7 @@ export class AnalyseService {
               abort.signal,
             );
           } catch (err) {
+            this.logger.error(`AI error in analysing_requirements: ${(err as Error).message}`, undefined, 'AnalyseService');
             emit(this.mapAiError(err as Error));
             subscriber.complete();
             return;
@@ -106,6 +120,7 @@ export class AnalyseService {
           emit({ type: 'summary', payload: summary });
 
           // Step 4: story generation
+          this.logger.log('Step: generating_stories', 'AnalyseService');
           emit({ type: 'progress', step: 'generating_stories' });
           let storiesText: string;
           try {
@@ -114,6 +129,7 @@ export class AnalyseService {
               abort.signal,
             );
           } catch (err) {
+            this.logger.error(`AI error in generating_stories: ${(err as Error).message}`, undefined, 'AnalyseService');
             emit(this.mapAiError(err as Error));
             subscriber.complete();
             return;
@@ -154,6 +170,7 @@ export class AnalyseService {
           }
 
           // Step 5: overlap detection
+          this.logger.log('Step: detecting_overlaps', 'AnalyseService');
           emit({ type: 'progress', step: 'detecting_overlaps' });
 
           const withDuplicates = this.overlapService.detectSessionDuplicates([...stories]);
@@ -174,9 +191,11 @@ export class AnalyseService {
           }
 
           // Step 6: complete
+          this.logger.log('Step: complete', 'AnalyseService');
           emit({ type: 'progress', step: 'complete' });
           subscriber.complete();
         } catch (err) {
+          this.logger.error(`Unhandled error: ${(err as Error).message}`, undefined, 'AnalyseService');
           if (err instanceof PdfError) {
             emit({ type: 'error', payload: { code: err.code, message: err.message } });
           } else {

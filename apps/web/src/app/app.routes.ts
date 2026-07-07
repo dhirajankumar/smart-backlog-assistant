@@ -17,4 +17,14 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./features/review/review.component').then(m => m.ReviewComponent),
   },
+  {
+    path: 'tasks/:storyId',
+    loadComponent: () =>
+      import('./features/tasks/tasks.component').then(m => m.TasksComponent),
+  },
+  {
+    path: 'publish',
+    loadComponent: () =>
+      import('./features/publish/publish.component').then(m => m.PublishComponent),
+  },
 ];
