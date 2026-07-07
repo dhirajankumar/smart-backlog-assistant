@@ -62,20 +62,16 @@
     @if (isEditing) {
       <div class="edit-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Title</mat-label>
-          <input matInput [(ngModel)]="editTitle" />
+          <input matInput [(ngModel)]="editTitle" placeholder="Title" />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Role (As a…)</mat-label>
-          <input matInput [(ngModel)]="editRole" />
+          <input matInput [(ngModel)]="editRole" placeholder="Role (As a…)" />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Benefit (I want… so that…)</mat-label>
-          <textarea matInput [(ngModel)]="editBenefit" rows="2"></textarea>
+          <textarea matInput [(ngModel)]="editBenefit" rows="2" placeholder="Benefit (I want… so that…)"></textarea>
         </mat-form-field>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Acceptance Criteria (one per line)</mat-label>
-          <textarea matInput [(ngModel)]="editCriteriaText" rows="5"></textarea>
+          <textarea matInput [(ngModel)]="editCriteriaText" rows="5" placeholder="Acceptance Criteria (one per line)"></textarea>
         </mat-form-field>
         <div class="edit-row">
           <mat-form-field appearance="outline">
@@ -101,11 +97,10 @@
     @if (showReject) {
       <div class="inline-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Reason for rejection (optional)</mat-label>
           <input
             matInput
             [(ngModel)]="rejectReason"
-            placeholder="Why is this story being rejected?"
+            placeholder="Reason for rejection (optional)"
           />
         </mat-form-field>
       </div>
@@ -114,12 +109,11 @@
     @if (showFeedback) {
       <div class="inline-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Feedback for regeneration</mat-label>
           <textarea
             matInput
             [(ngModel)]="feedbackText"
             rows="3"
-            placeholder="Describe what should be different in the regenerated story…"
+            placeholder="Feedback for regeneration — describe what should be different…"
           ></textarea>
         </mat-form-field>
       </div>
