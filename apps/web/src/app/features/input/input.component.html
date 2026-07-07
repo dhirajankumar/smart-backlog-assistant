@@ -66,8 +66,15 @@
     <button
       type="submit"
       class="submit-btn"
-      [disabled]="!canSubmit"
-    >Analyse Requirements</button>
+      [disabled]="!canSubmit || isSubmitting"
+    >
+      @if (isSubmitting) {
+        <span class="spinner" aria-hidden="true"></span>
+        Analysing…
+      } @else {
+        Analyse Requirements
+      }
+    </button>
 
   </form>
 </div>

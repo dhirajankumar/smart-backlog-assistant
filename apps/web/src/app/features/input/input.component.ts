@@ -20,6 +20,7 @@ export class InputComponent {
   pdfFile: File | null = null;
   backlogFile: File | null = null;
   pdfError: string | null = null;
+  isSubmitting = false;
 
   constructor(
     private readonly router: Router,
@@ -55,8 +56,9 @@ export class InputComponent {
   }
 
   onSubmit(): void {
-    if (!this.canSubmit) return;
+    if (!this.canSubmit || this.isSubmitting) return;
 
+    this.isSubmitting = true;
     const formData = new FormData();
     if (this.inputMode === 'pdf') {
       formData.append('inputType', 'pdf');

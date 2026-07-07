@@ -7,7 +7,7 @@ function stripCodeFences(text: string): string {
   return text.replace(/^```(?:\w+)?\n?([\s\S]*?)\n?```$/s, '$1').trim();
 }
 
-@Injectable()
+@Injectable() 
 export class AiService {
   constructor(private readonly logger: AppLogger) {}
 
@@ -23,7 +23,7 @@ export class AiService {
       );
 
       let stdout = '';
-      let stderr = '';
+      let stderr = ''; 
 
       proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
       proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
@@ -39,17 +39,13 @@ export class AiService {
         }
       });
 
-      proc.on('error', (err) => {
-        this.logger.error(`AI process error: ${err.message}`, undefined, 'AiService');
-        reject(err);
-      });
+      proc.on('error', reject);
 
       if (signal) {
         signal.addEventListener('abort', () => {
           proc.kill();
           const e = new Error('AbortError');
           e.name = 'AbortError';
-          this.logger.warn('AI call aborted by signal', 'AiService');
           reject(e);
         });
       }
