@@ -50,7 +50,6 @@ export class InputComponent {
   }
 
   get canSubmit(): boolean {
-    if (this.backlogFile !== null) return true;
     if (this.inputMode === 'pdf') return this.pdfFile !== null && !this.pdfError;
     return this.textContent.trim().length > 0;
   }

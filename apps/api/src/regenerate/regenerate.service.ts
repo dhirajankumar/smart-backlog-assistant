@@ -16,12 +16,14 @@ import { AiService } from '../ai/ai.service';
 import { OverlapService } from '../overlap/overlap.service';
 import { storyRegenerationPrompt } from '../ai/prompts/story-regeneration.prompt';
 import { RegenerateDto } from './regenerate.dto';
+import { AppLogger } from '../common/logger/app-logger.service';
 
 @Injectable()
 export class RegenerateService {
   constructor(
     private readonly aiService: AiService,
     private readonly overlapService: OverlapService,
+    private readonly logger: AppLogger,
   ) {}
 
   stream(dto: RegenerateDto): Observable<MessageEvent> {
@@ -34,6 +36,7 @@ export class RegenerateService {
 
       (async () => {
         try {
+          this.logger.log('Step: regenerating', 'RegenerateService');
           emit({ type: 'progress', step: 'regenerating' });
 
           let raw: string;
@@ -49,6 +52,7 @@ export class RegenerateService {
               abort.signal,
             );
           } catch (err) {
+            this.logger.error(`AI error in regenerating: ${(err as Error).message}`, undefined, 'RegenerateService');
             emit(this.mapAiError(err as Error));
             subscriber.complete();
             return;
@@ -122,9 +126,11 @@ export class RegenerateService {
             emit({ type: 'task', payload: task });
           }
 
+          this.logger.log('Step: complete', 'RegenerateService');
           emit({ type: 'complete' });
           subscriber.complete();
         } catch (err) {
+          this.logger.error(`Unhandled error: ${(err as Error).message}`, undefined, 'RegenerateService');
           emit({ type: 'error', payload: { code: 'AI_MALFORMED_RESPONSE', message: (err as Error).message } });
           subscriber.complete();
         } finally {

@@ -58,17 +58,29 @@ export class AnalysisService {
   }
 
   regenerate(dto: RegenerateDto): void {
-    const body = new FormData();
-    body.append('targetType', dto.targetType);
-    body.append('targetId', dto.targetId);
-    body.append('feedback', dto.feedback);
-    if (dto.parentStoryId) body.append('parentStoryId', dto.parentStoryId);
+    const state = this.session.getSnapshot();
+    const target = state.stories.find(s => s.id === dto.targetId);
+    if (!target) return;
 
-    this.streamSse('/api/regenerate', body, event => this.handleRegenerateEvent(event, dto))
-      .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
-        this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
-      });
+    const parentStory = dto.parentStoryId ? state.stories.find(s => s.id === dto.parentStoryId) : undefined;
+
+    const bodyObj: Record<string, unknown> = {
+      targetType: dto.targetType,
+      target,
+      feedback: dto.feedback,
+      existingBacklogItems: state.existingBacklogItems,
+    };
+    if (parentStory) bodyObj['parentStory'] = parentStory;
+
+    this.streamSse(
+      '/api/regenerate',
+      JSON.stringify(bodyObj),
+      event => this.handleRegenerateEvent(event, dto),
+      { 'Content-Type': 'application/json' },
+    ).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });
+    });
   }
 
   private handleAnalysisEvent(event: AnalysisSseEvent): void {
@@ -105,10 +117,10 @@ export class AnalysisService {
     }
   }
 
-  private async streamSse(url: string, body: FormData, onEvent: (e: AnalysisSseEvent) => void): Promise<void> {
+  private async streamSse(url: string, body: FormData | string, onEvent: (e: AnalysisSseEvent) => void, headers?: Record<string, string>): Promise<void> {
     let response: Response;
     try {
-      response = await fetch(url, { method: 'POST', body });
+      response = await fetch(url, { method: 'POST', body, headers });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not connect to the analysis service';
       this.session.setAnalysisError({ code: 'NETWORK_ERROR', message });

@@ -1,8 +1,8 @@
 # Smart Backlog Assistant — Project Overview
 
-**Last Updated**: 2026-07-03
-**Current Phase**: Implementation In Progress — Phase 7 (Polish) infrastructure complete; T041 validation blocked pending Phases 5–6
-**Status**: In Progress — Branch `feat/001-ai-backlog-refinement-phase3`
+**Last Updated**: 2026-07-07
+**Current Phase**: Implementation In Progress — Feature 001 Phases 1–2 complete, Phase 7 polish done; Feature 004 process logging now implemented
+**Status**: In Progress — Branch `mvp1/pdf-service`
 
 ## What This Project Is
 
@@ -18,9 +18,10 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 
 | # | Feature | Status | Artifacts |
 |---|---------|--------|-----------|
-| 001 | AI-Backed Backlog Refinement — MVP1 | **In Progress** — Phases 1–4 (US1+US2) complete; Phase 7 polish infrastructure done (T038–T040 ✅: ServeStaticModule, pkg.config.json, build-demo.bat); Phases 5–6 (T030–T037) and T041 validation pending | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [tasks](../../specs/001-ai-backlog-refinement/tasks.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
+| 001 | AI-Backed Backlog Refinement — MVP1 | **In Progress** — Phases 1–2 complete (T001–T014 ✅: Nx setup, shared types, NestJS bootstrap with ValidationPipe+CORS+ConfigModule, Angular bootstrap with all 5 lazy routes, AiService, PdfService with pdf-parse+unpdf fallback, all prompt modules, SessionService, AuditService); Phases 3–4 (US1+US2) complete; Phase 7 polish infrastructure done (T038–T040 ✅); Phases 5–6 (T030–T037) and T041 validation pending | [spec](../../specs/001-ai-backlog-refinement/spec.md) · [plan](../../specs/001-ai-backlog-refinement/plan.md) · [data model](../../specs/001-ai-backlog-refinement/data-model.md) · [API contracts](../../specs/001-ai-backlog-refinement/contracts/api-routes.md) · [tasks](../../specs/001-ai-backlog-refinement/tasks.md) · [quickstart](../../specs/001-ai-backlog-refinement/quickstart.md) |
 | 002 | UI Results Display | Draft — Spec complete | [spec](../../specs/002-ui-results-display/spec.md) |
 | 003 | MCP Integration and Custom Skills — MVP2 | **Tasks generated** — ready for `/speckit-implement` | [spec](../../specs/003-mcp-custom-skills/spec.md) · [tasks](../../specs/003-mcp-custom-skills/tasks.md) |
+| 004 | Process Logging | **Implemented** — winston `AppLogger` (US1 terminal output, US2 file per run, US3 level filtering) wired across all services | [spec](../../specs/004-process-logging/spec.md) · [research](../../specs/004-process-logging/research.md) · [data model](../../specs/004-process-logging/data-model.md) · [quickstart](../../specs/004-process-logging/quickstart.md) |
 
 ## Approved Tech Stack (Feature 001)
 

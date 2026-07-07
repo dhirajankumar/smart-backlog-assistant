@@ -73,6 +73,10 @@ export class SessionService {
 
   constructor(private readonly audit: AuditService) {}
 
+  getSnapshot(): SessionState {
+    return this.state.getValue();
+  }
+
   tasksForStory$(id: string): Observable<Task[]> {
     return this.state$.pipe(map(s => s.tasks[id] ?? []));
   }

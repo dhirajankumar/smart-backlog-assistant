@@ -8,7 +8,11 @@
       "Bash(dir *)",
       "Bash(node *)",
       "PowerShell(cmd /c \"C:\\\\Users\\\\dhiraj.an.kumar\\\\claude-workshop\\\\smart-backlog-assistant\\\\build-demo.bat\" 2>&1)",
-      "PowerShell(& cmd.exe /c \"`\"C:\\\\Users\\\\dhiraj.an.kumar\\\\claude-workshop\\\\smart-backlog-assistant\\\\build-demo.bat`\"\" 2>&1)"
+      "PowerShell(& cmd.exe /c \"`\"C:\\\\Users\\\\dhiraj.an.kumar\\\\claude-workshop\\\\smart-backlog-assistant\\\\build-demo.bat`\"\" 2>&1)",
+      "Bash(npx tsc *)",
+      "Bash(pkill -f \"node dist/apps/api/main.js\")",
+      "Bash(PORT=3002 NODE_ENV=production node dist/apps/api/main.js)",
+      "Bash(sh .specify/scripts/bash/check-prerequisites.sh --json --paths-only)"
     ]
   }
 }
