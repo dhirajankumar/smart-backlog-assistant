@@ -1,8 +1,8 @@
 # Smart Backlog Assistant — Project Overview
 
 **Last Updated**: 2026-07-07
-**Current Phase**: Implementation In Progress — Feature 001 Phases 1–2 complete, Phase 7 polish done; Feature 004 process logging now implemented
-**Status**: In Progress — Branch `mvp1/pdf-service`
+**Current Phase**: Implementation In Progress — Feature 001 Phases 1–2 complete, Phase 7 polish done; Feature 004 process logging implemented; Feature 005 welcome page plan complete
+**Status**: In Progress — Branch `feat/welcome-page`
 
 ## What This Project Is
 
@@ -22,6 +22,7 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 | 002 | UI Results Display | Draft — Spec complete | [spec](../../specs/002-ui-results-display/spec.md) |
 | 003 | MCP Integration and Custom Skills — MVP2 | **Tasks generated** — ready for `/speckit-implement` | [spec](../../specs/003-mcp-custom-skills/spec.md) · [tasks](../../specs/003-mcp-custom-skills/tasks.md) |
 | 004 | Process Logging | **Implemented** — winston `AppLogger` (US1 terminal output, US2 file per run, US3 level filtering) wired across all services | [spec](../../specs/004-process-logging/spec.md) · [research](../../specs/004-process-logging/research.md) · [data model](../../specs/004-process-logging/data-model.md) · [quickstart](../../specs/004-process-logging/quickstart.md) |
+| 005 | Welcome Page with MVP1 Onboarding | **Tasks Generated** — 20 tasks across 6 phases; 3 user stories; always-on `/welcome` route; Angular `WelcomeComponent` with "Start Refinement" → `/input`; NestJS `TerminalModule`; Angular Material tabs; ready for `/speckit-implement` | [spec](../../specs/005-welcome-page/spec.md) · [plan](../../specs/005-welcome-page/plan.md) · [data model](../../specs/005-welcome-page/data-model.md) · [contracts](../../specs/005-welcome-page/contracts/terminal-open.md) · [quickstart](../../specs/005-welcome-page/quickstart.md) · [tasks](../../specs/005-welcome-page/tasks.md) |
 
 ## Approved Tech Stack (Feature 001)
 
@@ -57,6 +58,7 @@ NestJS 10 in an Nx monorepo. Packaged via `pkg` — no install required on the c
 | [ADR-002](../../docs/decisions/ADR-002-feature-modules-not-mfe.md) | Angular lazy-loaded feature modules instead of micro-frontends (MVP1) | Accepted |
 | [ADR-003](../../docs/decisions/ADR-003-model-pinning.md) | AI model pinning and prompt versioning policy | Accepted |
 | [ADR-004](../../docs/decisions/ADR-004-pdf-parse-library.md) | PDF parsing — pdf-parse with unpdf fallback | Accepted |
+| [ADR-005](../../docs/decisions/ADR-005-terminal-launch-via-backend.md) | Terminal launch via NestJS backend API (not browser-side) with OS-native fallback instructions | Accepted |
 
 ## Governance
 
