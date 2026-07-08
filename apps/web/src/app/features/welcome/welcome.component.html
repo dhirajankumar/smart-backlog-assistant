@@ -4,9 +4,13 @@
     <h1>Welcome to Smart Backlog Assistant</h1>
     <p class="subtitle">Your AI-powered tool for turning requirements into refined user stories.</p>
     <span class="badge">MVP1 Demo Release</span>
+    <p class="model-info">
+      Powered by <strong>Claude Sonnet 4.5</strong> via the Claude CLI subprocess transport.
+    </p>
     <p class="rationale">
-      This tool runs entirely on your local machine using the Claude CLI — no API key or cloud
-      account needed. Authentication is handled via the Claude CLI OAuth flow.
+      This tool runs entirely on your local machine using the Claude CLI. A direct Anthropic API key
+      has not yet been procured, so authentication is handled via the Claude CLI OAuth flow — no API
+      key or cloud account configuration needed on your end.
     </p>
     <p class="step-label">Run this command in your terminal to authenticate:</p>
     <code class="command">claude auth login</code>
@@ -21,5 +25,24 @@
 
   <div class="section">
     <!-- ROADMAP SECTION -->
+    <h2>MVP1 Release</h2>
+    <mat-tab-group animationDuration="200ms">
+      <mat-tab label="Current Features">
+        @for (phase of currentPhases; track phase.id) {
+          <div class="phase-card">
+            <div class="phase-label">{{ phase.label }}</div>
+            <div class="phase-description">{{ phase.description }}</div>
+          </div>
+        }
+      </mat-tab>
+      <mat-tab label="Coming Soon">
+        @for (phase of upcomingPhases; track phase.id) {
+          <div class="phase-card upcoming">
+            <div class="phase-label">{{ phase.label }}</div>
+            <div class="phase-description">{{ phase.description }}</div>
+          </div>
+        }
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>

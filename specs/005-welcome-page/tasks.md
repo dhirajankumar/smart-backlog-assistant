@@ -85,9 +85,9 @@
 
 ### Implementation
 
-- [ ] T015 [P] [US3] Add `RoadmapPhase` interface and `MVP1_ROADMAP` constant to `apps/web/src/app/features/welcome/welcome.component.ts` (copy verbatim from `data-model.md`); expose `currentPhases` and `upcomingPhases` getters returning `MVP1_ROADMAP.filter(p => p.available)` and `MVP1_ROADMAP.filter(p => !p.available)` respectively; add `MatTabsModule` to component `imports` array
-- [ ] T016 [US3] Add MVP1 roadmap markup to `apps/web/src/app/features/welcome/welcome.component.html` replacing `<!-- ROADMAP SECTION -->`: `<h2>MVP1 Release</h2>`, `<mat-tab-group animationDuration="200ms">` with two `<mat-tab label="...">` children — "Current Features" tab iterates `@for (phase of currentPhases)` showing `phase.label` and `phase.description`; "Coming Soon" tab iterates `@for (phase of upcomingPhases)` showing same fields with a muted style
-- [ ] T017 [P] [US3] Style roadmap section in `apps/web/src/app/features/welcome/welcome.component.scss` — `.phase-card` for each roadmap item (`padding: 12px 0`, `border-bottom: 1px solid #eee`); phase label bold `0.95rem`; phase description `0.85rem #666`; "Coming Soon" phase label with `color: #9e9e9e`; ensure `mat-tab-group` width is 100%
+- [X] T015 [P] [US3] Add `RoadmapPhase` interface and `MVP1_ROADMAP` constant to `apps/web/src/app/features/welcome/welcome.component.ts` (copy verbatim from `data-model.md`); expose `currentPhases` and `upcomingPhases` getters returning `MVP1_ROADMAP.filter(p => p.available)` and `MVP1_ROADMAP.filter(p => !p.available)` respectively; add `MatTabsModule` to component `imports` array
+- [X] T016 [US3] Add MVP1 roadmap markup to `apps/web/src/app/features/welcome/welcome.component.html` replacing `<!-- ROADMAP SECTION -->`: `<h2>MVP1 Release</h2>`, `<mat-tab-group animationDuration="200ms">` with two `<mat-tab label="...">` children — "Current Features" tab iterates `@for (phase of currentPhases)` showing `phase.label` and `phase.description`; "Coming Soon" tab iterates `@for (phase of upcomingPhases)` showing same fields with a muted style
+- [X] T017 [P] [US3] Style roadmap section in `apps/web/src/app/features/welcome/welcome.component.scss` — `.phase-card` for each roadmap item (`padding: 12px 0`, `border-bottom: 1px solid #eee`); phase label bold `0.95rem`; phase description `0.85rem #666`; "Coming Soon" phase label with `color: #9e9e9e`; ensure `mat-tab-group` width is 100%
 
 **Checkpoint**: All three sections visible on the welcome page. Tab switching works. US3 acceptance scenarios 1–4 pass.
 

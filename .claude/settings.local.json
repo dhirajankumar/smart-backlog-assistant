@@ -12,7 +12,10 @@
       "Bash(npx tsc *)",
       "Bash(pkill -f \"node dist/apps/api/main.js\")",
       "Bash(PORT=3002 NODE_ENV=production node dist/apps/api/main.js)",
-      "Bash(sh .specify/scripts/bash/check-prerequisites.sh --json --paths-only)"
+      "Bash(sh .specify/scripts/bash/check-prerequisites.sh --json --paths-only)",
+      "Bash(bash .specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(bash .specify/scripts/bash/common.sh)",
+      "Bash(SPECIFY_FEATURE_DIRECTORY=\"specs/006-github-projects-mcp\" bash .specify/scripts/bash/setup-plan.sh --json)"
     ]
   }
 }
