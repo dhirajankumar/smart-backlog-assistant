@@ -73,7 +73,6 @@
     "@typescript-eslint/parser": "^6.13.2",
     "eslint": "~8.48.0",
     "eslint-config-prettier": "^9.0.0",
-    "github-mcp-server": "^1.8.7",
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
     "jest-environment-node": "^29.4.1",

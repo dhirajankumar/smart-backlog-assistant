@@ -35,14 +35,20 @@ claude auth login
 Follow the browser prompt to complete the SSO login. Credentials are stored in your local profile and are picked up automatically when the app starts.
 
 ### Step 3 — Run the App
+Unzip the deployment bundle shared or located at the source project smart-backlog-assistant\dist\backlog-assistant-demo.zip
 
-Double-click **`backlog-assistant.exe`** — no terminal needed.
+Just Double-click **`backlog-assistant.exe`** — no terminal needed.
 
 Once the console window appears and shows `Server running`, open your browser and go to:
 
 ```
 http://localhost:3000
 ```
+Notice a /logs directory will in the once application bootup.
+
+### Step x - For Developers
+Run build-demo.bat to build and create deployment bundle.
+Developer needs to install 7Zip is their machine at location c:\\program files\. Refer https://www.7-zip.org/download.html
 
 > This URL loads the **UI** (the Angular web app). The backend API runs on the same port under `/api/` — you never need to open that directly.
 
