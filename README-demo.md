@@ -22,7 +22,27 @@ winget install OpenJS.NodeJS.LTS
 
 Restart your terminal after installation so `node` is available on PATH. If `winget` is not available on your machine, download the installer from [nodejs.org](https://nodejs.org) and choose the **LTS** release.
 
-> The GitHub integration is optional. If you skip this step the app starts normally; only the "Publish to GitHub Projects" feature will be unavailable.
+> The GitHub MCP integration is optional. If you skip this step the app starts normally; only the "Publish to GitHub Projects" feature will be unavailable.
+
+#### GitHub Personal Access Token
+
+To use the **Publish to GitHub Projects** feature, you need a GitHub Personal Access Token (PAT):
+
+1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Classic tokens**
+2. Click **Generate new token**
+3. Set a token name (e.g. `backlog-assistant`) and an expiration date
+4. Under Scopes, grant:
+   - Repo — access
+   - Projects — access
+5. Click **Generate token** and copy the value immediately (it is shown only once)
+
+Create a `.env` file in the same folder as `backlog-assistant.exe` and add the token:
+
+```
+GITHUB_TOKEN=your_token_here
+```
+
+The app reads `.env` automatically on startup. Keep this file private — do not commit it to source control.
 
 ### Step 2 — Authenticate (one-time setup)
 
