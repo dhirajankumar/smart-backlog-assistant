@@ -1,13 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
 
 import { AppModule } from './app/app.module';
 import { AppLogger } from './common/logger/app-logger.service';
 
 async function bootstrap() {
-  await ConfigModule.forRoot({ isGlobal: true });
-
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));

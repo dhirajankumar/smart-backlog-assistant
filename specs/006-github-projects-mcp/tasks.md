@@ -1,3 +1,4 @@
+
 # Tasks: GitHub Projects Backlog Integration via Local GitHub MCP Server
 
 **Input**: Design documents from `specs/006-github-projects-mcp/`

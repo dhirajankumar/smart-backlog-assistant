@@ -83,16 +83,36 @@ export class GithubProjectsService {
     }
 
     const result = await this.mcpClient.callTool('list_projects', { owner, per_page: 20 }) as any;
+    this.logger.log(`list_projects raw result: ${JSON.stringify(result)?.slice(0, 500)}`, 'GithubProjectsService');
+
+    if (result?.isError) {
+      const errText = result?.content?.[0]?.text ?? 'Unknown MCP error';
+      throw new ServiceUnavailableException(`GitHub API error: ${errText}`);
+    }
+
     const text = result?.content?.[0]?.text;
-    if (!text) return [];
+    if (!text) {
+      this.logger.warn(`list_projects returned no text content for owner '${owner}'`, 'GithubProjectsService');
+      return [];
+    }
 
     try {
       const parsed = JSON.parse(text);
+
+      // GitHub API error bodies (e.g. 403/404) arrive as { message: "..." }
+      if (parsed?.message && !parsed?.projects && !Array.isArray(parsed)) {
+        throw new ServiceUnavailableException(`GitHub API error: ${parsed.message}`);
+      }
+
       const projects: Array<{ number: number; title: string }> = Array.isArray(parsed)
         ? parsed
-        : parsed?.projects ?? [];
-      return projects.map((p: any) => ({ number: p.number, title: p.title }));
-    } catch {
+        : parsed?.projects ?? parsed?.nodes ?? [];
+      return projects
+        .filter((p: any) => p.number != null && p.title != null)
+        .map((p: any) => ({ number: Number(p.number), title: String(p.title) }));
+    } catch (err) {
+      if (err instanceof ServiceUnavailableException) throw err;
+      this.logger.warn(`list_projects JSON parse failed: ${(err as Error).message}`, 'GithubProjectsService');
       return [];
     }
   }

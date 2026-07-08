@@ -112,14 +112,20 @@ export class GithubProjectsConfigComponent implements OnInit {
   loadBoards(): void {
     if (!this.owner) return;
     this.isLoadingBoards = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+    this.boards = [];
     this.http.get<{ boards: { number: number; title: string }[] }>(`/api/github-projects/boards?owner=${encodeURIComponent(this.owner)}`)
       .subscribe({
         next: res => {
           this.boards = res.boards;
           this.isLoadingBoards = false;
+          if (this.boards.length === 0) {
+            this.errorMessage = `No GitHub Projects v2 found for '${this.owner}'. Create one at github.com/users/${this.owner}/projects/new (or github.com/orgs/${this.owner}/projects/new for an org).`;
+          }
         },
         error: err => {
-          this.errorMessage = err?.error?.message ?? 'Failed to load boards';
+          this.errorMessage = err?.error?.message ?? 'Failed to load boards. Check that GITHUB_TOKEN is set and has the "project" scope.';
           this.isLoadingBoards = false;
         },
       });

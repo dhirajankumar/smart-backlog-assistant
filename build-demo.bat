@@ -30,11 +30,40 @@ if !errorlevel! neq 0 (
   exit /b !errorlevel!
 )
 
-echo [4/4] Creating demo zip...
-powershell -Command "Compress-Archive -Force -Path 'dist\backlog-assistant.exe','dist\web','README-demo.md' -DestinationPath 'dist\backlog-assistant-demo.zip'"
+echo [3.6/4] Bundling github-mcp-server alongside exe...
+if exist dist\github-mcp-server rmdir /s /q dist\github-mcp-server
+xcopy /E /I /Q node_modules\github-mcp-server dist\github-mcp-server
 if !errorlevel! neq 0 (
-  echo ERROR: Zip creation failed
+  echo ERROR: github-mcp-server copy failed
   exit /b !errorlevel!
+)
+echo [3.7/4] Installing github-mcp-server runtime dependencies (npm resolves full transitive tree)...
+cd dist\github-mcp-server
+call npm install --omit=dev --prefer-offline --no-audit --no-fund
+if !errorlevel! neq 0 (
+  echo ERROR: npm install for github-mcp-server failed
+  cd ..\..
+  exit /b !errorlevel!
+)
+cd ..\..
+
+echo [4/4] Creating demo zip...
+if exist dist\backlog-assistant-demo rmdir /s /q dist\backlog-assistant-demo
+mkdir dist\backlog-assistant-demo
+copy /Y dist\backlog-assistant.exe dist\backlog-assistant-demo\backlog-assistant.exe
+xcopy /E /I /Q dist\web dist\backlog-assistant-demo\web
+xcopy /E /I /Q dist\github-mcp-server dist\backlog-assistant-demo\github-mcp-server
+if exist .env copy /Y .env dist\backlog-assistant-demo\.env
+copy /Y README-demo.md dist\backlog-assistant-demo\README-demo.md
+if exist dist\backlog-assistant-demo.zip del dist\backlog-assistant-demo.zip
+cd dist
+"C:\Program Files\7-Zip\7z.exe" a -tzip backlog-assistant-demo.zip backlog-assistant-demo
+set ZIPERR=!errorlevel!
+cd ..
+rmdir /s /q dist\backlog-assistant-demo
+if !ZIPERR! neq 0 (
+  echo ERROR: Zip creation failed. Ensure 7-Zip is installed at "C:\Program Files\7-Zip\7z.exe"
+  exit /b !ZIPERR!
 )
 
 echo.
@@ -42,4 +71,5 @@ echo Build complete!
 echo Output: dist\backlog-assistant-demo.zip
 echo   - dist\backlog-assistant.exe (~60 MB, Windows x64 standalone, node22)
 echo   - dist\web\browser\ (Angular static files, must stay next to exe)
+echo   - dist\github-mcp-server\ (MCP server, must stay next to exe; requires node.exe on PATH)
 echo   - README-demo.md

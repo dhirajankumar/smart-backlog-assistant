@@ -4,19 +4,37 @@
 
 Anthropic access is provisioned by your organisation — no personal API key is required. The app uses your active Anthropic SSO session.
 
-### Step 1 — Authenticate (one-time setup)
+### Step 1 — Install Node.js (required for GitHub integration)
+
+The main app is a self-contained exe, but the GitHub MCP server (used for publishing stories to GitHub Projects) is a JavaScript process that requires **Node.js 22** on your PATH.
+
+Check whether Node is already installed:
+
+```cmd
+node --version
+```
+
+If the command is not found or the version is below 22, install it:
+
+```cmd
+winget install OpenJS.NodeJS.LTS
+```
+
+Restart your terminal after installation so `node` is available on PATH. If `winget` is not available on your machine, download the installer from [nodejs.org](https://nodejs.org) and choose the **LTS** release.
+
+> The GitHub integration is optional. If you skip this step the app starts normally; only the "Publish to GitHub Projects" feature will be unavailable.
+
+### Step 2 — Authenticate (one-time setup)
 
 If you have not already authenticated on this machine, open **Command Prompt** or **PowerShell** and run:
 
 ```cmd
-ant auth login
+claude auth login
 ```
 
 Follow the browser prompt to complete the SSO login. Credentials are stored in your local profile and are picked up automatically when the app starts.
 
-> If your organisation uses Workload Identity Federation, the required environment variables (`ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, etc.) will be provisioned by IT — no action needed.
-
-### Step 2 — Run the App
+### Step 3 — Run the App
 
 Double-click **`backlog-assistant.exe`** — no terminal needed.
 
@@ -34,9 +52,8 @@ http://localhost:3000
 
 ### 1. Submit Requirements
 
-- **Paste Text** — paste a plain-text requirements document into the textarea.
+- **Paste Text or JSON** — paste a plain-text requirements document into the textarea.
 - **Upload PDF** — upload a text-based PDF (max 10 MB). Scanned/image PDFs are not supported.
-- **Existing backlog JSON** _(optional)_ — upload a `.json` file containing an array of objects with at least a `"title"` field. The AI uses this to flag overlaps with stories it generates.
 
 Click **Analyse Requirements** to start. Stories stream in as they are generated.
 
@@ -86,7 +103,7 @@ We are building an online task management application for small teams.
 8. The system must support concurrent users without data loss (target: 100 concurrent users).
 ```
 
-### Existing backlog JSON (optional — save as `backlog.json` and upload)
+### Existing backlog JSON
 
 ```json
 [
@@ -135,9 +152,10 @@ This script runs four steps:
 | 2 | `nx build web --configuration=production` — compiles the Angular frontend |
 | 3 | `pkg dist/apps/api/main.js --config pkg.config.json` — bundles the API into a Windows x64 standalone exe (Node 22, ~60 MB) |
 | 3.5 | Copies Angular static files to `dist/web/browser/` alongside the exe |
-| 4 | Zips `backlog-assistant.exe`, `dist/web/`, and `README-demo.md` into `dist/backlog-assistant-demo.zip` |
+| 3.6 | Copies `node_modules/github-mcp-server` to `dist/github-mcp-server/` so the MCP server is self-contained in the zip |
+| 4 | Zips `backlog-assistant.exe`, `dist/web/`, `dist/github-mcp-server/`, and `README-demo.md` into `dist/backlog-assistant-demo.zip` |
 
-The final artefact is `dist/backlog-assistant-demo.zip`. The zip must be distributed as-is — the `dist/web/browser/` folder must stay next to the exe, as the API serves those static files at runtime.
+The final artefact is `dist/backlog-assistant-demo.zip`. The zip must be distributed as-is — `dist/web/browser/` and `dist/github-mcp-server/` must stay next to the exe at runtime.
 
 ### pkg configuration (`pkg.config.json`)
 

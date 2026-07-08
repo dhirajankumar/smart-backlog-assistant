@@ -1,0 +1,33 @@
+1. Problem Definition
+Product teams waste enormous time turning messy requirement documents  PDFs, Word files, meeting notes into well-structured Jira or GitHub backlog items. Someone has to read the document, extract the intent, write user stories, break them into tasks, check for duplicates against what already exists in the project board, and then manually create all those issues in GitHub. It's repetitive, slow, and the quality depends heavily on whoever is doing it that day.
+This application automates that translation. You drop in a requirements document (or paste text), point it at your live GitHub Projects board, then generates a structured backlog of user stories and tasks that don't duplicate what's already there. A human reviews each generated item, approves, rejects, or amends it, and the approved items are published directly to GitHub as issues linked to the project board.
+The key insight is that it's not trying to remove the human, it's trying to remove the mechanical work before the human judgment happens. The AI does the first draft, the reviewer does the quality gate. 
+AI Tool used problem refinement: GitHub spec-kit tool 
+Main prompts Used to Build Smart Backlog Assistant 
+1. Constitution / Project Init 
+? /speckit-constitution- Defined the core project principles, data rules, AI behavior guidelines, and quality standards.
+Feature Specs (in order)
+2. Feature 001 - Core MVP 
+? /speckit-specify I want to build a tool, that can analyse tickets, meeting notes or requirement document. It should able to create user stories and tasks for that reviewer can approve, reject, amend or give feedback before publishing user stories or task. First want a working system."
+WHY- It defined the entire core: PDF/text input, AI story generation, and the human-in-the-loop review
+3. Feature 002 -UI Results Display
+?/speckit-specify UI should display  stories and task with their relationship in good format.
+WHY - Specified the hierarchy? task display with expand/collapse and JSON export.                                 4. Feature 003 — MCP 
+? /speckit-specify "MVP2: MCP Integration and Custom Skills — extend the Smart Backlog Assistant with live custom Claude Code skills…"                                                        
+WHY: Planned live Jira or github MCP integration, direct publish, and three new speckit skills.                                    
+5. Feature 004 - Process Logging 
+?/speckit-specify Basic logging or output that shows the process. The logs that save in a .log files.
+WHY : Setup logging framework at root level
+6. Feature 005 - Welcome Page 
+?/speckit-specify Add a welcome page to instruct user for prerequisites to first run below command "claude auh login" by opening a terminal to authenticate.  Tell user that login constraint is due to lack of claude API key under a MVP1 release section. If feasible add button which open user local terminal in window, and/or instruction to open and run. Add a section (scrollable or tabs whichever simpler) saying its a MVP1 release for demo, and show the future implementations like requirement , feature, plan, tasks to user.
+WHY: Built the onboarding instruction page and an MVP1 roadmap section.  
+? /speckit-plan 1. /welcome should always appear, add a button "start refinement" to navigate to /input screen. 2. Remove auth state plan
+Feature 006 — GitHub MCP
+?/speckit-specify Update/replace spec for integration of jira/linear,  with Github project's local MCP server implementation.                                                           
+WHY: Narrowed the MVP2  down to GitHub Projects v2 via the official local MCP server.                             8. Feature 007 — Spec control
+?/speckit-specify "Add Hooks to add guardrail on /speckit-task or /speckit-implement, that Hook should run to find feature spec is present or not, if not prompt the user to implement those first."          
+WHY:  Added prerequisite-tasks and/speckit-implement fail fast with a clear message if spec.md or plan.md is missing.
+There are various other prompts used like /speckit-plan, /speckit-clarify, /speckit-converge, /speckit-task, /speckit-implement, /debug etc
+
+
+

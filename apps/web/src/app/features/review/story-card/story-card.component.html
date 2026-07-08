@@ -94,6 +94,18 @@
       </div>
     }
 
+    @if (showApprove) {
+      <div class="inline-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <input
+            matInput
+            [(ngModel)]="approveNote"
+            placeholder="Approval note (optional)"
+          />
+        </mat-form-field>
+      </div>
+    }
+
     @if (showReject) {
       <div class="inline-form">
         <mat-form-field appearance="outline" class="full-width">
@@ -121,7 +133,7 @@
   </mat-card-content>
 
   <mat-card-actions class="card-actions">
-    @if (!isEditing && !showReject && !showFeedback) {
+    @if (!isEditing && !showApprove && !showReject && !showFeedback) {
       <button
         mat-flat-button
         color="primary"
@@ -129,7 +141,7 @@
         [title]="story.confidence === Confidence.Low && !lowConfidenceAcknowledged
           ? 'Acknowledge low confidence before approving'
           : ''"
-        (click)="onApprove()"
+        (click)="toggleApprove()"
       >
         <mat-icon>check</mat-icon> Approve
       </button>
@@ -151,6 +163,13 @@
       <button mat-stroked-button (click)="cancelEdit()">
         <mat-icon>cancel</mat-icon> Cancel
       </button>
+    }
+
+    @if (showApprove) {
+      <button mat-flat-button color="primary" (click)="confirmApprove()">
+        <mat-icon>check_circle</mat-icon> Confirm Approve
+      </button>
+      <button mat-stroked-button (click)="toggleApprove()">Cancel</button>
     }
 
     @if (showReject) {

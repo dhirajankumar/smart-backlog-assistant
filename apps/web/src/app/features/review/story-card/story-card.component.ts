@@ -54,6 +54,7 @@ export class StoryCardComponent implements OnChanges {
 
   lowConfidenceAcknowledged = false;
   isEditing = false;
+  showApprove = false;
   showReject = false;
   showFeedback = false;
 
@@ -64,6 +65,7 @@ export class StoryCardComponent implements OnChanges {
   editPriority: Priority = Priority.Medium;
   editCategory = '';
 
+  approveNote = '';
   rejectReason = '';
   feedbackText = '';
 
@@ -71,6 +73,7 @@ export class StoryCardComponent implements OnChanges {
     if (changes['story']) {
       this.lowConfidenceAcknowledged = false;
       this.isEditing = false;
+      this.showApprove = false;
       this.showReject = false;
       this.showFeedback = false;
     }
@@ -102,6 +105,23 @@ export class StoryCardComponent implements OnChanges {
     this.lowConfidenceAcknowledged = true;
   }
 
+  toggleApprove(): void {
+    if (!this.canApprove) return;
+    this.showApprove = !this.showApprove;
+    if (this.showApprove) {
+      this.approveNote = '';
+      this.showReject = false;
+      this.showFeedback = false;
+      this.isEditing = false;
+    }
+  }
+
+  confirmApprove(): void {
+    this.approve.emit(this.story.id);
+    this.showApprove = false;
+    this.approveNote = '';
+  }
+
   onApprove(): void {
     if (!this.canApprove) return;
     this.approve.emit(this.story.id);
@@ -112,6 +132,7 @@ export class StoryCardComponent implements OnChanges {
     if (this.showReject) {
       this.rejectReason = '';
       this.showFeedback = false;
+      this.showApprove = false;
       this.isEditing = false;
     }
   }
@@ -130,6 +151,7 @@ export class StoryCardComponent implements OnChanges {
     this.editPriority = this.story.priority;
     this.editCategory = this.story.category;
     this.isEditing = true;
+    this.showApprove = false;
     this.showReject = false;
     this.showFeedback = false;
   }
@@ -157,6 +179,7 @@ export class StoryCardComponent implements OnChanges {
     this.showFeedback = !this.showFeedback;
     if (this.showFeedback) {
       this.feedbackText = '';
+      this.showApprove = false;
       this.showReject = false;
       this.isEditing = false;
     }
