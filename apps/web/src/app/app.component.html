@@ -1,1 +1,15 @@
-<router-outlet></router-outlet>
+<header class="app-header">
+  <nav class="app-nav">
+    <a routerLink="/welcome" routerLinkActive="active" class="nav-brand">Smart Backlog Assistant</a>
+    <div class="nav-links">
+      <a routerLink="/input" routerLinkActive="active" class="nav-link">Start Refinement</a>
+      <a routerLink="/backlog" routerLinkActive="active" class="nav-link">Backlog</a>
+      <a routerLink="/settings/github-projects" routerLinkActive="active" class="nav-link nav-link--icon" title="Settings">⚙</a>
+    </div>
+    <app-github-connection-badge></app-github-connection-badge>
+  </nav>
+</header>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>

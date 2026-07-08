@@ -1,5 +1,7 @@
 import { SessionStatus } from '../enums/session-status.enum';
 import { ExistingBacklogItem } from './existing-backlog-item.entity';
+import { GitHubProjectsConnection } from './github-projects-connection.entity';
+import { GitHubPublishSession } from './github-publish.entity';
 import { InputDocument } from './input-document.entity';
 import { KeyRequirementsSummary } from './key-requirements-summary.entity';
 import { ReviewAction } from './review-action.entity';
@@ -19,4 +21,6 @@ export interface SessionState {
   promptVersions: Record<string, string>;
   analysisError: { code: string; message: string } | null;
   reviewerName: string | null;
+  githubConnection: GitHubProjectsConnection | null;
+  githubPublishSession: GitHubPublishSession | null;
 }

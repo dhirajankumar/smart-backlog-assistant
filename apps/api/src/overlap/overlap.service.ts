@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   ExistingBacklogItem,
+  GitHubProjectItem,
   LIMITS,
   OverlapFlag,
   UserStory,
@@ -65,5 +66,16 @@ export class OverlapService {
       }
     }
     return stories;
+  }
+
+  detectGithubOverlaps(
+    stories: UserStory[],
+    githubItems: GitHubProjectItem[],
+  ): UserStory[] {
+    const existing: ExistingBacklogItem[] = githubItems.map(i => ({
+      title: i.title,
+      description: i.body ?? undefined,
+    }));
+    return this.detectExistingOverlaps(stories, existing);
   }
 }

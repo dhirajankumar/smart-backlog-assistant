@@ -18,6 +18,8 @@ import { AiService } from '../ai/ai.service';
 import { PdfService } from '../pdf/pdf.service';
 import { PdfError } from '../pdf/pdf.validator';
 import { OverlapService } from '../overlap/overlap.service';
+import { GithubProjectsContextService } from '../github-projects/github-projects-context.service';
+import { GithubProjectsService } from '../github-projects/github-projects.service';
 import { requirementsSummaryPrompt } from '../ai/prompts/requirements-summary.prompt';
 import { storyGenerationPrompt } from '../ai/prompts/story-generation.prompt';
 import { AnalyseDto, AnalyseTasksDto } from './analyse.dto';
@@ -29,6 +31,8 @@ export class AnalyseService {
     private readonly aiService: AiService,
     private readonly pdfService: PdfService,
     private readonly overlapService: OverlapService,
+    private readonly githubContextService: GithubProjectsContextService,
+    private readonly githubProjectsService: GithubProjectsService,
     private readonly logger: AppLogger,
   ) {}
 
@@ -71,21 +75,40 @@ export class AnalyseService {
             return;
           }
 
-          // Step 2: validate backlog JSON
+          // Step 2: validate backlog JSON or fetch live GitHub context
           this.logger.log('Step: validating_backlog', 'AnalyseService');
           emit({ type: 'progress', step: 'validating_backlog' });
           let existingItems: ExistingBacklogItem[] = [];
 
-          if (backlogBuffer) {
+          if (dto.backlogSourceType === 'live-github') {
+            const connection = this.githubProjectsService.getStatus();
+            if (connection.status === 'active') {
+              try {
+                emit({ type: 'progress', step: 'github_context_fetch', message: 'Fetching GitHub Projects context…', itemCount: null });
+                const { items, truncated } = await this.githubContextService.fetchItems(connection.owner, connection.projectNumber);
+                existingItems = items.map(i => ({ title: i.title, description: i.body ?? undefined }));
+                if (truncated) {
+                  emit({ type: 'progress', step: 'github_context_truncated', message: `Context limited to 200 most-recent items`, itemCount: 200 });
+                } else {
+                  emit({ type: 'progress', step: 'github_context_ready', message: `GitHub Projects context loaded (${items.length} items)`, itemCount: items.length });
+                }
+              } catch (err) {
+                emit({ type: 'connection_error', source: 'github_mcp', message: 'GitHub connection failed — falling back to manual upload', fallbackEnabled: true });
+                // Fall through without existing items
+              }
+            }
+          } else if (backlogBuffer) {
             let raw: unknown;
             try {
               raw = JSON.parse(backlogBuffer.toString('utf-8'));
             } catch {
+              this.logger.error('BACKLOG_SCHEMA_INVALID: Backlog file contains invalid JSON', undefined, 'AnalyseService');
               emit({ type: 'error', payload: { code: 'BACKLOG_SCHEMA_INVALID', message: 'Backlog file contains invalid JSON' } });
               subscriber.complete();
               return;
             }
             if (!Array.isArray(raw) || (raw as Record<string, unknown>[]).some((item) => typeof item['title'] !== 'string')) {
+              this.logger.error('BACKLOG_SCHEMA_INVALID: Backlog JSON must be an array of objects each with a title string field', undefined, 'AnalyseService');
               emit({ type: 'error', payload: { code: 'BACKLOG_SCHEMA_INVALID', message: 'Backlog JSON must be an array of objects each with a title string field' } });
               subscriber.complete();
               return;
@@ -113,6 +136,7 @@ export class AnalyseService {
           try {
             summary = JSON.parse(summaryText) as KeyRequirementsSummary;
           } catch {
+            this.logger.error('AI_MALFORMED_RESPONSE: Requirements summary response was not valid JSON', undefined, 'AnalyseService');
             emit({ type: 'error', payload: { code: 'AI_MALFORMED_RESPONSE', message: 'Requirements summary response was not valid JSON' } });
             subscriber.complete();
             return;
@@ -140,6 +164,7 @@ export class AnalyseService {
             const parsed = JSON.parse(storiesText) as Partial<UserStory>[] | { stories: Partial<UserStory>[] };
             rawStories = Array.isArray(parsed) ? parsed : (parsed.stories ?? []);
           } catch {
+            this.logger.error('AI_MALFORMED_RESPONSE: Story generation response was not valid JSON', undefined, 'AnalyseService');
             emit({ type: 'error', payload: { code: 'AI_MALFORMED_RESPONSE', message: 'Story generation response was not valid JSON' } });
             subscriber.complete();
             return;

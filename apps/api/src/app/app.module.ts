@@ -6,6 +6,8 @@ import { join, dirname } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AnalyseModule } from '../analyse/analyse.module';
+import { GithubMcpModule } from '../github-mcp/github-mcp.module';
+import { GithubProjectsModule } from '../github-projects/github-projects.module';
 import { RegenerateModule } from '../regenerate/regenerate.module';
 import { LoggerModule } from '../common/logger/logger.module';
 
@@ -20,6 +22,8 @@ const webRoot = isPkg
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     LoggerModule,
+    GithubMcpModule,
+    GithubProjectsModule,
     AnalyseModule,
     RegenerateModule,
     ...(isProduction || isPkg

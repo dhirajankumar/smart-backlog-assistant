@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LIMITS } from '@smart-backlog/shared';
 import { AnalysisService } from '../../core/analysis.service';
+import { SessionService } from '../../core/session.service';
 
 @Component({
   standalone: true,
   selector: 'app-input',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, AsyncPipe, FormsModule, RouterModule],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
 })
@@ -25,6 +26,7 @@ export class InputComponent {
   constructor(
     private readonly router: Router,
     private readonly analysisService: AnalysisService,
+    readonly session: SessionService,
   ) {}
 
   setMode(mode: 'text' | 'pdf'): void {

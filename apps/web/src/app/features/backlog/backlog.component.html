@@ -1,0 +1,100 @@
+<div class="backlog-page">
+  <div class="backlog-header">
+    <h1>GitHub Backlog</h1>
+
+    <ng-container *ngIf="session.isGithubConnected$ | async">
+      <div class="controls-row">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by title…"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+          aria-label="Search items"
+        />
+
+        <select
+          class="filter-select"
+          [value]="statusFilter()"
+          (change)="statusFilter.set($any($event.target).value)"
+          aria-label="Filter by status"
+        >
+          <option *ngFor="let s of availableStatuses()" [value]="s">{{ s === 'All' ? 'All statuses' : s }}</option>
+        </select>
+
+        <select
+          class="filter-select"
+          [value]="priorityFilter()"
+          (change)="priorityFilter.set($any($event.target).value)"
+          aria-label="Filter by priority"
+        >
+          <option *ngFor="let p of availablePriorities()" [value]="p">{{ p === 'All' ? 'All priorities' : p }}</option>
+        </select>
+
+        <button class="btn-icon" (click)="loadItems()" [disabled]="isLoading()" title="Refresh">
+          <span *ngIf="!isLoading()">↻</span>
+          <span *ngIf="isLoading()">…</span>
+        </button>
+      </div>
+
+      <div *ngIf="truncated()" class="truncation-notice">
+        Showing 200 most-recent items — project has more items.
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Not connected empty state -->
+  <div *ngIf="!(session.isGithubConnected$ | async)" class="empty-state">
+    <p>No GitHub Projects connected.</p>
+    <a routerLink="/settings/github-projects" class="btn-primary">Configure GitHub Projects</a>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="(session.isGithubConnected$ | async) && isLoading()" class="loading-state">
+    <p>Loading backlog items…</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="errorMessage() && !isLoading()" class="error-state">
+    <p>{{ errorMessage() }}</p>
+    <button class="btn-secondary" (click)="loadItems()">Retry</button>
+  </div>
+
+  <!-- Connected: empty project -->
+  <div *ngIf="(session.isGithubConnected$ | async) && !isLoading() && items().length === 0 && !errorMessage()" class="empty-state">
+    <p>No items found in this project.</p>
+  </div>
+
+  <!-- Connected: no filter matches -->
+  <div *ngIf="(session.isGithubConnected$ | async) && !isLoading() && items().length > 0 && filteredItems().length === 0" class="empty-state">
+    <p>No items match your search or filters.</p>
+    <button class="btn-secondary" (click)="clearFilters()">Clear filters</button>
+  </div>
+
+  <!-- Item list -->
+  <div *ngIf="(session.isGithubConnected$ | async) && !isLoading() && filteredItems().length > 0" class="item-list">
+    <div
+      *ngFor="let item of filteredItems(); trackBy: trackByIssue"
+      class="item-card"
+      [class.item-card--expanded]="expandedItemId() === item.issueNumber"
+    >
+      <div class="item-header" (click)="toggleExpand(item.issueNumber)" role="button" tabindex="0"
+           (keydown.enter)="toggleExpand(item.issueNumber)">
+        <span class="item-number">#{{ item.issueNumber }}</span>
+        <span class="item-title">{{ item.title }}</span>
+        <div class="item-chips">
+          <span class="chip chip--status">{{ item.status }}</span>
+          <span *ngIf="item.priority" class="chip chip--priority">{{ item.priority }}</span>
+          <span *ngFor="let label of item.labels" class="chip chip--label">{{ label }}</span>
+        </div>
+        <span class="item-date">{{ item.updatedAt | date:'mediumDate' }}</span>
+        <span class="item-expand-icon">{{ expandedItemId() === item.issueNumber ? '▲' : '▼' }}</span>
+      </div>
+
+      <div *ngIf="expandedItemId() === item.issueNumber" class="item-body">
+        <p *ngIf="item.body; else noDesc" class="item-body-text">{{ item.body }}</p>
+        <ng-template #noDesc><p class="item-body-empty">No description available.</p></ng-template>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,138 +1,135 @@
-# Architecture Overview — Smart Backlog Assistant MVP1
+# Architecture Overview — Smart Backlog Assistant
 
-**Feature**: AI-Backed Backlog Refinement | **Stack**: Angular 17 + NestJS 10 (Nx monorepo)
-**Updated**: 2026-07-01
+**Stack**: Angular 17 + NestJS 10 (Nx monorepo) | **Updated**: 2026-07-08
 
 ---
 
-## 1. Main Components
+## 1. High-Level Structure
 
 ```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                         Nx Monorepo Workspace                               ║
-║                                                                              ║
-║  ┌─────────────────────────────────┐   ┌────────────────────────────────┐  ║
-║  │       apps/web  (Angular 17)    │   │      apps/api  (NestJS 10)     │  ║
-║  │                                 │   │                                │  ║
-║  │  ┌───────────────────────────┐  │   │  ┌────────────────────────┐   │  ║
-║  │  │   Lazy-Loaded Features    │  │   │  │     NestJS Modules      │   │  ║
-║  │  │                           │  │   │  │                        │   │  ║
-║  │  │  /           InputModule  │  │   │  │  AnalyseModule         │   │  ║
-║  │  │  /analysis  AnalysisModule│  │   │  │  RegenerateModule      │   │  ║
-║  │  │  /review    ReviewModule  │  │   │  │  ExportModule          │   │  ║
-║  │  │  /tasks     TasksModule   │  │   │  │  AiModule          ★   │   │  ║
-║  │  │  /publish   PublishModule │  │   │  │  PdfModule             │   │  ║
-║  │  └───────────────────────────┘  │   │  │  OverlapModule         │   │  ║
-║  │                                 │   │  └────────────────────────┘   │  ║
-║  │  ┌───────────────────────────┐  │   │                                │  ║
-║  │  │     Core Services         │  │   │  ┌────────────────────────┐   │  ║
-║  │  │                           │  │   │  │  Static File Server    │   │  ║
-║  │  │  SessionService           │  │   │  │  (ServeStaticModule)   │   │  ║
-║  │  │    BehaviorSubject state  │  │   │  │  serves apps/web build │   │  ║
-║  │  │  AuditService             │  │   │  └────────────────────────┘   │  ║
-║  │  │    append-only log        │  │   └────────────────────────────────┘  ║
-║  │  │  AnalysisService          │  │                                        ║
-║  │  │    EventSource / SSE      │  │   ┌────────────────────────────────┐  ║
-║  │  └───────────────────────────┘  │   │       libs/shared  (Nx lib)    │  ║
-║  │                                 │   │                                │  ║
-║  │  ┌───────────────────────────┐  │   │  entities/   interfaces        │  ║
-║  │  │   Angular Material 17     │  │   │  dtos/       request/response  │  ║
-║  │  │   (UI components)         │  │   │  enums/      Priority etc.     │  ║
-║  │  └───────────────────────────┘  │   │  constants/  MODEL_ID, LIMITS  │  ║
-║  └─────────────────────────────────┘   └────────────────────────────────┘  ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-              │  localhost:3000                        │
-              │  (browser)                             │  HTTPS
-              │                                        ▼
-              │                          ┌─────────────────────────┐
-              │                          │   Anthropic Claude API  │
-              │                          │   model: claude-sonnet  │
-              │                          │         -4-6     ★      │
-              │                          └─────────────────────────┘
-              ▼
- ┌─────────────────────────────┐
- │  dist/backlog-assistant.exe │   ← pkg bundles NestJS + Angular +
- │  (~60 MB, Windows x64)      │     Node.js runtime into one file
- └─────────────────────────────┘
+┌─────────────────────┐     ┌──────────────────────────────────────┐
+│   apps/web          │     │   apps/api  (NestJS)                 │
+│   (Angular 17)      │     │                                      │
+│                     │     │  AnalyseModule   →  Anthropic API    │
+│  /input             │◄───►│  AiModule        →  claude-sonnet    │
+│  /analysis          │     │  RegenerateModule                    │
+│  /review            │     │  GithubMcpModule  →  github-mcp-server│
+│  /backlog           │     │  GithubProjectsModule                │
+│  /publish           │     │  PdfModule / OverlapModule           │
+│  /settings          │     │                                      │
+└─────────────────────┘     └──────────────────────────────────────┘
+         │                                   │
+         └──── localhost:3000 ───────────────┘
+                                             │
+                             ┌───────────────┴──────────────┐
+                             │  External Services            │
+                             │  • Anthropic Claude API       │
+                             │  • github-mcp-server (stdio)  │
+                             │  • GitHub Projects v2 (GraphQL│
+                             └──────────────────────────────┘
 
-★  = AI integration point
+  Distributed as: dist/backlog-assistant.exe  (~60 MB, Windows x64)
 ```
 
 ---
 
-## 2. Data Flow Through the System
+## 2. Core Analysis Flow (MVP1)
+
+User pastes requirements → AI generates stories → Reviewer approves/rejects/amends → Export JSON
 
 ```
-  REVIEWER                  ANGULAR (browser)              NESTJS (local server)         CLAUDE API
-     │                            │                                │                          │
-     │  paste text / upload       │                                │                          │
-     │  PDF + optional JSON  ───► │                                │                          │
-     │                            │                                │                          │
-     │                            │  POST /api/analyse             │                          │
-     │                            │  multipart/form-data      ───► │                          │
-     │                            │                                │                          │
-     │                            │                                │  pdf-parse               │
-     │                            │                                │  extracts text           │
-     │                            │                                │                          │
-     │                            │                                │  class-validator         │
-     │                            │                                │  validates backlog JSON  │
-     │                            │                                │                          │
-     │                            │                                │  ── requirements ──────► │
-     │                            │                                │     summary prompt       │
-     │                            │  ◄── SSE: progress ────────── │  ◄── summary JSON ─────  │
-     │  "Analysing requirements"  │                                │                          │
-     │  ◄─────────────────────── │                                │  ── story generation ──► │
-     │                            │  ◄── SSE: story (×N) ──────── │  ◄── streaming JSON ──── │
-     │  story cards appear        │                                │     (one story at a time)│
-     │  one by one ◄──────────── │                                │                          │
-     │                            │  ◄── SSE: overlap_update ──── │  overlap.service         │
-     │                            │                                │  (in-process, no AI)     │
-     │                            │  ◄── SSE: complete ─────────  │                          │
-     │                            │                                │                          │
-     │                            │  SessionService.appendStory()  │                          │
-     │                            │  SessionService.patchOverlap() │                          │
-     │                            │                                │                          │
-     │  ── Approve story ──────► │  SessionService.approveStory() │                          │
-     │                            │  AuditService.log()            │                          │
-     │                            │                                │                          │
-     │  ── Reject story ───────► │  SessionService.rejectStory()  │                          │
-     │       + reason             │  AuditService.log()            │                          │
-     │                            │                                │                          │
-     │  ── Amend story ────────► │  SessionService.amendStory()   │                          │
-     │       edit fields          │  (saves originalAiText first)  │                          │
-     │                            │  AuditService.log()            │                          │
-     │                            │                                │                          │
-     │  ── Feedback ───────────► │  POST /api/regenerate     ───► │  ── regen prompt ──────► │
-     │                            │  ◄── SSE: story (revised) ─── │  ◄── streaming JSON ──── │
-     │  revised story appears ◄─ │  SessionService.replaceStory() │                          │
-     │                            │                                │                          │
-     │  ── View tasks ─────────► │  POST /api/analyse/tasks  ───► │  ── task generation ───► │
-     │       (on-demand)          │  ◄── JSON: Task[] ─────────── │  ◄── JSON ─────────────  │
-     │  task cards appear ◄───── │  SessionService                │                          │
-     │                            │    .setTasksForStory()         │                          │
-     │                            │                                │                          │
-     │  ── Publish ────────────► │  export.service                │                          │
-     │       + reviewer name      │    .buildExport()              │                          │
-     │                            │  (approved + amended only)     │                          │
-     │  JSON file downloads ◄─── │  Blob download                 │                          │
-     │                            │  (browser-native, no server)   │                          │
-     ▼                            ▼                                ▼                          ▼
-
-  Session ends when browser tab closes — no data persisted server-side
+Browser                    NestJS                     Claude API
+  │                           │                           │
+  │  POST /api/analyse        │                           │
+  │  (text + optional PDF) ──►│  extract + validate       │
+  │                           │──── summarise prompt ────►│
+  │◄── SSE: progress ─────── │◄─── summary JSON ─────── │
+  │                           │──── story generation ────►│
+  │◄── SSE: story ×N ──────  │◄─── streaming JSON ─────  │
+  │◄── SSE: complete ──────── │                           │
+  │                           │                           │
+  │  approve / reject / amend │  (in-browser state only)  │
+  │  POST /api/regenerate ───►│──── regen prompt ────────►│
+  │◄── SSE: revised story ─── │◄─── streaming JSON ─────  │
+  │                           │                           │
+  │  POST /api/analyse/tasks  │──── task gen prompt ─────►│
+  │◄── JSON: Task[] ──────── │◄─── JSON ───────────────  │
 ```
+
+> Session state lives in the browser. Nothing is persisted server-side.
 
 ---
 
-## 3. Places where AI model is called in the funcationality.
+## 3. GitHub Projects Flow (MVP2)
 
+```
+Browser                    NestJS                  github-mcp-server     GitHub
+  │                           │                          │                  │
+  │  /settings/github-projects│                          │                  │
+  │  enter PAT + owner ──────►│                          │                  │
+  │                           │── list_projects ────────►│── GraphQL ──────►│
+  │◄── board list ─────────── │◄─ project list ──────── │◄─ Projects v2 ── │
+  │                           │                          │                  │
+  │  select board ───────────►│  store connection        │                  │
+  │                           │                          │                  │
+  │  /backlog (live view) ───►│── list_project_items ───►│── GraphQL ──────►│
+  │◄── live board items ───── │◄─ items[] ────────────── │◄─ board items ── │
+  │                           │                          │                  │
+  │  Publish to GitHub ──────►│  create issues + add     │                  │
+  │                           │  to project ────────────►│── create_issue ─►│
+  │◄── publish results ─────  │◄─ results[] ─────────── │                  │
+```
+
+> Publish is idempotent — already-created issues are skipped (tracked by `internalItemId`).
+
+---
+
+## 4. Where AI Is Called
+
+| Trigger | Endpoint | Output |
+|---|---|---|
+| Analyse requirements | `POST /api/analyse` | `KeyRequirementsSummary` + `UserStory[]` via SSE |
+| Generate tasks | `POST /api/analyse/tasks` | `Task[]` JSON |
+| Regenerate story | `POST /api/regenerate` | Revised `UserStory` via SSE |
+
+GitHub publish makes **no AI calls** — it calls `github-mcp-server` tools directly via MCP stdio.
+
+---
+
+## 5. GitHub MCP Module
+
+```
+GithubMcpModule  (global singleton)
+├── GithubMcpCredentialsService   reads GITHUB_TOKEN from .env
+└── GithubMcpClientService        MCP Client → StdioClientTransport
+    │  spawns subprocess:
+    │    dev:  npx -y github-mcp-server stdio
+    │    pkg:  node <execDir>/github-mcp-server/mcp-cli.js stdio
+    └── callTool(name, args)
+
+GithubProjectsModule
+├── GithubProjectsService          connection state + board listing
+├── GithubProjectsContextService   fetches live items for prompt injection
+├── GithubProjectsPublishService   issue creation + project card addition
+└── GithubProjectsController       REST at /api/github-projects/*
+```
+
+**API endpoints** (`/api/github-projects/`):
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/status` | Connection state + configured board |
+| `GET` | `/boards?owner=` | List GitHub Projects v2 boards |
+| `POST` | `/configure` | Store owner, projectNumber, repo |
+| `GET` | `/items` | Fetch live board items |
+| `POST` | `/publish` | Create issues + add to board |
 
 ---
 
 ## References
 
 - Approved plan: [`specs/001-ai-backlog-refinement/plan.md`](../specs/001-ai-backlog-refinement/plan.md)
-- Data model: [`specs/001-ai-backlog-refinement/data-model.md`](../specs/001-ai-backlog-refinement/data-model.md)
-- API contracts: [`specs/001-ai-backlog-refinement/contracts/api-routes.md`](../specs/001-ai-backlog-refinement/contracts/api-routes.md)
+- GitHub Projects MCP spec: [`specs/006-github-projects-mcp/`](../specs/006-github-projects-mcp/)
 - ADR-001 (stack): [`docs/decisions/ADR-001-angular-nestjs-nx.md`](decisions/ADR-001-angular-nestjs-nx.md)
 - ADR-003 (AI safety): [`docs/decisions/ADR-003-model-pinning.md`](decisions/ADR-003-model-pinning.md)
+- ADR-006 (GitHub MCP): [`docs/decisions/ADR-006-github-projects-mcp.md`](decisions/ADR-006-github-projects-mcp.md)

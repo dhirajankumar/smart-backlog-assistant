@@ -15,7 +15,7 @@ each depends on the previous succeeding.
 - A GitHub Personal Access Token (classic) with `project` and `repo` (or `public_repo`) scopes
 - A GitHub Projects v2 board with at least 3 existing items in the target repository
 - A target GitHub repository where test issues can be created (use a dedicated test repo)
-- Node.js 18+ and npm (for running `@github/github-mcp-server` via npx)
+- Node.js 18+ and npm (for running `github-mcp-server` v1.8.7 via npx)
 - `.env.example` is present at the root — copy it to `.env` and populate `GITHUB_TOKEN`
 
 ---
@@ -35,7 +35,7 @@ npx nx serve web &
 ./backlog-assistant.exe
 ```
 
-**Expected**: App starts. NestJS backend spawns `@github/github-mcp-server` subprocess via stdio.
+**Expected**: App starts. NestJS backend spawns `github-mcp-server` subprocess via stdio.
 No error in backend logs. Frontend loads at `http://localhost:4200`.
 
 ---
@@ -64,6 +64,36 @@ No error in backend logs. Frontend loads at `http://localhost:4200`.
 7. Click **"Test Connection"**.
 
 **Expected**: Error message "Project not found" in the panel. Badge remains "Not configured" or previous state. HTTP response is 404.
+
+---
+
+## Scenario 1b: Board Selector — List and Switch Projects (US1b)
+
+**Goal**: Verify the boards dropdown populates from GitHub Projects and the connection reconfigures when a different board is selected.
+
+### Prerequisites
+
+- Scenario 1 complete and connection active.
+- At least 2 GitHub Projects v2 boards exist under the configured owner.
+
+### Steps
+
+1. Navigate to Settings → GitHub Projects.
+2. After the initial connection is active, click **"Browse boards"** (or the boards dropdown).
+3. Observe the dropdown populates with available board names.
+
+### Expected Outcomes
+
+- `GET /api/github-projects/boards` returns a list of boards (name + projectNumber).
+- The dropdown shows at least the currently connected board.
+- Selecting a different board re-calls `POST /api/github-projects/configure` and the badge updates to the new board name.
+- Selecting the same board (re-test) shows the same item count as before.
+
+### Failure Scenario Validation
+
+4. Temporarily revoke `project` scope from the PAT and reload the boards dropdown.
+
+**Expected**: Error message in the panel: "Unable to list boards — check GITHUB_TOKEN scope". Existing connection remains unchanged.
 
 ---
 

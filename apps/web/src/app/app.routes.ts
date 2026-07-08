@@ -32,4 +32,14 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./features/publish/publish.component').then(m => m.PublishComponent),
   },
+  {
+    path: 'backlog',
+    loadComponent: () =>
+      import('./features/backlog/backlog.component').then(m => m.BacklogComponent),
+  },
+  {
+    path: 'settings/github-projects',
+    loadComponent: () =>
+      import('./features/settings/github-projects-config.component').then(m => m.GithubProjectsConfigComponent),
+  },
 ];
