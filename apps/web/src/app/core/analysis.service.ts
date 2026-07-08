@@ -16,13 +16,14 @@ export interface RegenerateDto {
   feedback: string;
 }
 
-type ProgressEvent = { type: 'progress'; step: string };
+type ProgressEvent = { type: 'progress'; step: string; message?: string; itemCount?: number | null };
 type SummaryEvent = { type: 'summary'; payload: KeyRequirementsSummary };
 type StoryEvent = { type: 'story'; payload: UserStory };
 type OverlapUpdateEvent = { type: 'overlap_update'; storyId: string; flag: OverlapFlag; reference: string | null };
 type ErrorEvent = { type: 'error'; payload: { code: string; message: string } };
+type ConnectionErrorEvent = { type: 'connection_error'; source: string; message: string; fallbackEnabled: boolean };
 
-export type AnalysisSseEvent = ProgressEvent | SummaryEvent | StoryEvent | OverlapUpdateEvent | ErrorEvent;
+export type AnalysisSseEvent = ProgressEvent | SummaryEvent | StoryEvent | OverlapUpdateEvent | ErrorEvent | ConnectionErrorEvent;
 
 @Injectable({ providedIn: 'root' })
 export class AnalysisService {
@@ -35,6 +36,14 @@ export class AnalysisService {
     const pdfFile = formData.get('pdfFile') as File | null;
     const textContent = (formData.get('textContent') as string | null) ?? '';
     const wordCount = inputType === 'text' ? textContent.trim().split(/\s+/).filter(Boolean).length : 0;
+
+    const snapshot = this.session.getSnapshot();
+    const githubConnection = snapshot.githubConnection;
+    if (githubConnection?.status === 'active') {
+      formData.append('backlogSourceType', 'live-github');
+      formData.append('githubProjectOwner', githubConnection.owner);
+      formData.append('githubProjectNumber', String(githubConnection.projectNumber));
+    }
 
     this.session.startAnalysis(
       {
@@ -83,6 +92,8 @@ export class AnalysisService {
     });
   }
 
+  readonly githubConnectionFailed$ = new BehaviorSubject<boolean>(false);
+
   private handleAnalysisEvent(event: AnalysisSseEvent): void {
     switch (event.type) {
       case 'progress':
@@ -102,6 +113,10 @@ export class AnalysisService {
         break;
       case 'error':
         this.session.setAnalysisError(event.payload);
+        break;
+      case 'connection_error':
+        this.githubConnectionFailed$.next(true);
+        this.currentStep$.next(`connection_error: ${event.message}`);
         break;
     }
   }

@@ -6,6 +6,9 @@ import {
   ActionType,
   Confidence,
   ExistingBacklogItem,
+  GitHubProjectsConnection,
+  GitHubPublishResult,
+  GitHubPublishSession,
   InputDocument,
   ItemStatus,
   KeyRequirementsSummary,
@@ -32,6 +35,8 @@ const INITIAL_STATE: SessionState = {
   promptVersions: {},
   analysisError: null,
   reviewerName: null,
+  githubConnection: null,
+  githubPublishSession: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -69,6 +74,23 @@ export class SessionService {
       rejected: s.stories.filter(st => st.status === ItemStatus.Rejected).length,
       pending: s.stories.filter(st => st.status === ItemStatus.Draft).length,
     }))
+  );
+
+  readonly githubConnection$: Observable<GitHubProjectsConnection | null> = this.state$.pipe(
+    map(s => s.githubConnection)
+  );
+  readonly isGithubConnected$: Observable<boolean> = this.githubConnection$.pipe(
+    map(c => c?.status === 'active')
+  );
+  readonly githubPublishResults$: Observable<GitHubPublishResult[]> = this.state$.pipe(
+    map(s => s.githubPublishSession?.results ?? [])
+  );
+  readonly publishedItemMap$: Observable<Map<string, number>> = this.githubPublishResults$.pipe(
+    map(results => new Map(
+      results
+        .filter(r => r.status === 'created' && r.githubIssueNumber !== null)
+        .map(r => [r.internalItemId, r.githubIssueNumber!])
+    ))
   );
 
   constructor(private readonly audit: AuditService) {}
@@ -256,6 +278,16 @@ export class SessionService {
       userStories: approvedStories,
       auditLog: s.auditLog,
     };
+  }
+
+  setGithubConnection(connection: GitHubProjectsConnection | null): void {
+    const s = this.state.getValue();
+    this.state.next({ ...s, githubConnection: connection });
+  }
+
+  setGithubPublishSession(session: GitHubPublishSession): void {
+    const s = this.state.getValue();
+    this.state.next({ ...s, githubPublishSession: session });
   }
 
   reset(): void {

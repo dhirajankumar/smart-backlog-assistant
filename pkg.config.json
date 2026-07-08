@@ -1,3 +1,6 @@
 {
-  "targets": ["node22-win-x64"]
+  "targets": ["node22-win-x64"],
+  "assets": {
+    "exclude": [".env", ".env.*", "*.env"]
+  }
 }

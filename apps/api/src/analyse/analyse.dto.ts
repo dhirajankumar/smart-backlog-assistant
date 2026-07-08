@@ -94,6 +94,18 @@ export class AnalyseDto {
   @IsString()
   @IsOptional()
   textContent?: string;
+
+  @IsIn(['live-github', 'json-upload', 'none'])
+  @IsOptional()
+  backlogSourceType?: 'live-github' | 'json-upload' | 'none';
+
+  @IsString()
+  @IsOptional()
+  githubProjectOwner?: string;
+
+  @IsString()
+  @IsOptional()
+  githubProjectNumber?: string;
 }
 
 export class AnalyseTasksDto {

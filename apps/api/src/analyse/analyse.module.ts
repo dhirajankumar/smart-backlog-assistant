@@ -5,6 +5,7 @@ import { LIMITS } from '@smart-backlog/shared';
 import { AiModule } from '../ai/ai.module';
 import { PdfModule } from '../pdf/pdf.module';
 import { OverlapModule } from '../overlap/overlap.module';
+import { GithubProjectsModule } from '../github-projects/github-projects.module';
 import { AnalyseController } from './analyse.controller';
 import { AnalyseService } from './analyse.service';
 
@@ -19,6 +20,7 @@ import { AnalyseService } from './analyse.service';
     AiModule,
     PdfModule,
     OverlapModule,
+    GithubProjectsModule,
   ],
   controllers: [AnalyseController],
   providers: [AnalyseService],
