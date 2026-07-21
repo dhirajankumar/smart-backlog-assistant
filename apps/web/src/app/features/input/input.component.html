@@ -19,7 +19,7 @@
 
     @if (inputMode === 'text') {
       <div class="form-group">
-        <label for="textContent">Requirements text</label>
+        <label for="textContent">Requirements text or JSON</label>
         <textarea
           id="textContent"
           name="textContent"
@@ -49,15 +49,18 @@
     }
 
     <div class="form-group" *ngIf="!(session.isGithubConnected$ | async)">
+     <!--
       <label for="backlogJson">
         Existing backlog JSON <span class="hint">(optional — array of objects with a "title" field)</span>
       </label>
+     
       <input
         id="backlogJson"
         type="file"
         accept=".json,application/json"
         (change)="onBacklogSelected($event)"
       />
+      -->
       @if (backlogFile) {
         <p class="file-selected">Selected: {{ backlogFile.name }}</p>
       }

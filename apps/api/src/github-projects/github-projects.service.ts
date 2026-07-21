@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { GitHubProjectsConnection } from '@smart-backlog/shared';
 import { GithubMcpClientService } from '../github-mcp/github-mcp-client.service';
 import { AppLogger } from '../common/logger/app-logger.service';
@@ -32,6 +32,9 @@ export class GithubProjectsService {
 
     try {
       const result = await this.mcpClient.callTool('get_project', { owner, project_number: projectNumber }) as any;
+      if (result?.isError) {
+        throw new Error(result?.content?.[0]?.text ?? 'Unknown MCP error');
+      }
       const projectName: string = result?.content?.[0]?.text
         ? JSON.parse(result.content[0].text)?.title ?? `Project #${projectNumber}`
         : `Project #${projectNumber}`;
@@ -65,6 +68,9 @@ export class GithubProjectsService {
     } catch (err) {
       const msg = (err as Error).message ?? String(err);
 
+      if (msg.includes('401') || msg.toLowerCase().includes('unauthorized')) {
+        throw new UnauthorizedException('GitHub token is missing or invalid. Update GITHUB_TOKEN in .env with a valid classic PAT (required scopes: project, repo).');
+      }
       if (msg.includes('403') || msg.includes('Forbidden') || msg.includes('scope')) {
         throw new ForbiddenException('Insufficient GitHub token scopes. Required: project, repo. Visit github.com/settings/tokens to regenerate.');
       }
@@ -87,6 +93,9 @@ export class GithubProjectsService {
 
     if (result?.isError) {
       const errText = result?.content?.[0]?.text ?? 'Unknown MCP error';
+      if (errText.includes('401') || errText.toLowerCase().includes('unauthorized')) {
+        throw new UnauthorizedException('GitHub token is missing or invalid. Update GITHUB_TOKEN in .env with a valid classic PAT (required scopes: project, repo).');
+      }
       throw new ServiceUnavailableException(`GitHub API error: ${errText}`);
     }
 

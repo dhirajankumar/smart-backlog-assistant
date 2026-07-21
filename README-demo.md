@@ -22,7 +22,27 @@ winget install OpenJS.NodeJS.LTS
 
 Restart your terminal after installation so `node` is available on PATH. If `winget` is not available on your machine, download the installer from [nodejs.org](https://nodejs.org) and choose the **LTS** release.
 
-> The GitHub integration is optional. If you skip this step the app starts normally; only the "Publish to GitHub Projects" feature will be unavailable.
+> The GitHub MCP integration is optional. If you skip this step the app starts normally; only the "Publish to GitHub Projects" feature will be unavailable.
+
+#### GitHub Personal Access Token
+
+To use the **Publish to GitHub Projects** feature, you need a GitHub Personal Access Token (PAT):
+
+1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Classic tokens**
+2. Click **Generate new token**
+3. Set a token name (e.g. `backlog-assistant`) and an expiration date
+4. Under Scopes, grant:
+   - Repo — access
+   - Projects — access
+5. Click **Generate token** and copy the value immediately (it is shown only once)
+
+Create a `.env` file in the same folder as `backlog-assistant.exe` and add the token:
+
+```
+GITHUB_TOKEN=your_token_here
+```
+
+The app reads `.env` automatically on startup. Keep this file private — do not commit it to source control.
 
 ### Step 2 — Authenticate (one-time setup)
 
@@ -35,14 +55,20 @@ claude auth login
 Follow the browser prompt to complete the SSO login. Credentials are stored in your local profile and are picked up automatically when the app starts.
 
 ### Step 3 — Run the App
+Unzip the deployment bundle shared or located at the source project smart-backlog-assistant\dist\backlog-assistant-demo.zip
 
-Double-click **`backlog-assistant.exe`** — no terminal needed.
+Just Double-click **`backlog-assistant.exe`** — no terminal needed.
 
 Once the console window appears and shows `Server running`, open your browser and go to:
 
 ```
 http://localhost:3000
 ```
+Notice a /logs directory will in the once application bootup.
+
+### Step x - For Developers
+Run build-demo.bat to build and create deployment bundle.
+Developer needs to install 7Zip is their machine at location c:\\program files\. Refer https://www.7-zip.org/download.html
 
 > This URL loads the **UI** (the Angular web app). The backend API runs on the same port under `/api/` — you never need to open that directly.
 

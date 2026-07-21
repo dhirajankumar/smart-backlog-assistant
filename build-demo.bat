@@ -30,22 +30,14 @@ if !errorlevel! neq 0 (
   exit /b !errorlevel!
 )
 
-echo [3.6/4] Bundling github-mcp-server alongside exe...
+echo [3.6/4] Bundling github-mcp-shim alongside exe...
 if exist dist\github-mcp-server rmdir /s /q dist\github-mcp-server
-xcopy /E /I /Q node_modules\github-mcp-server dist\github-mcp-server
+mkdir dist\github-mcp-server\dist
+copy /Y tools\github-mcp-shim\index.js dist\github-mcp-server\dist\index.js
 if !errorlevel! neq 0 (
-  echo ERROR: github-mcp-server copy failed
+  echo ERROR: github-mcp-shim copy failed
   exit /b !errorlevel!
 )
-echo [3.7/4] Installing github-mcp-server runtime dependencies (npm resolves full transitive tree)...
-cd dist\github-mcp-server
-call npm install --omit=dev --prefer-offline --no-audit --no-fund
-if !errorlevel! neq 0 (
-  echo ERROR: npm install for github-mcp-server failed
-  cd ..\..
-  exit /b !errorlevel!
-)
-cd ..\..
 
 echo [4/4] Creating demo zip...
 if exist dist\backlog-assistant-demo rmdir /s /q dist\backlog-assistant-demo

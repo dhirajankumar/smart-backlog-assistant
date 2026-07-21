@@ -41,10 +41,10 @@ export class GithubMcpClientService implements OnModuleInit, OnApplicationShutdo
       const token = this.credentials.getToken();
       // When packaged with pkg, spawn the bundled local copy instead of fetching via npx
       const isPkg = typeof (process as any).pkg !== 'undefined';
-      const command = isPkg ? 'node' : 'npx';
+      const command = 'node';
       const args = isPkg
         ? [path.join(path.dirname(process.execPath), 'github-mcp-server', 'dist', 'index.js'), 'stdio']
-        : ['-y', 'github-mcp-server', 'stdio'];
+        : [path.join(process.cwd(), 'tools', 'github-mcp-shim', 'index.js')];
       const transport = new StdioClientTransport({
         command,
         args,

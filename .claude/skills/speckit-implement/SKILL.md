@@ -171,6 +171,58 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
 
+   **After-task hook** — immediately after marking each task `[X]`:
+   - Check `.specify/extensions.yml` for entries under `hooks.after_task`.
+   - If the file is absent or unparseable, skip silently.
+   - Filter hooks where `enabled` is explicitly `false`; treat missing `enabled` as `true`.
+   - Skip any hook that has a non-empty `condition` field (leave condition evaluation to HookExecutor).
+   - Convert command names dot-to-hyphen (`speckit.converge` → `speckit-converge`).
+   - For each remaining hook:
+     - **Mandatory** (`optional: false`):
+       ```
+       ## Extension Hooks
+
+       **Automatic Hook**: {name}
+       Executing: `/{command}`
+       EXECUTE_COMMAND: {command}
+       ```
+       After emitting the block, actually invoke the hook and wait for it to finish before continuing to the next task.
+     - **Optional** (`optional: true`):
+       ```
+       ## Extension Hooks
+
+       **Optional Hook**: {name}
+       Command: `/{command}`
+       Description: {description}
+
+       To execute: `/{command}`
+       ```
+
+   **After-story hook** — after every task under a user story heading is marked `[X]`:
+   - A story is complete when all `- [ ]` lines under its `## Story N:` (or equivalent story-level heading) in tasks.md have been changed to `- [X]`.
+   - Check `.specify/extensions.yml` for entries under `hooks.after_story`.
+   - Apply the same enabled/condition/dot-to-hyphen rules as the after-task hook above.
+   - For each remaining hook:
+     - **Mandatory** (`optional: false`):
+       ```
+       ## Extension Hooks
+
+       **Automatic Hook**: {name}
+       Executing: `/{command}`
+       EXECUTE_COMMAND: {command}
+       ```
+       After emitting the block, actually invoke the hook and wait for it to finish before continuing to the next story.
+     - **Optional** (`optional: true`):
+       ```
+       ## Extension Hooks
+
+       **Optional Hook**: {name}
+       Command: `/{command}`
+       Description: {description}
+
+       To execute: `/{command}`
+       ```
+
 9. Completion validation:
    - Verify all required tasks are completed
    - Check that implemented features match the original specification
