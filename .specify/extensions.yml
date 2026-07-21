@@ -1,0 +1,29 @@
+version: "1.0"
+
+# Extension hooks for the Smart Backlog Assistant spec-kit workflow.
+# Hooks are keyed by lifecycle point and consumed by the skills that support them.
+# Set enabled: false to disable a hook without removing it.
+# optional: false  → skill auto-executes the hook (EXECUTE_COMMAND block emitted)
+# optional: true   → skill surfaces the hook for the user to run manually
+
+hooks:
+
+  # Triggered by speckit-implement after every individual task is marked [X].
+  after_task:
+    - name: "converge-on-task-complete"
+      command: "speckit.converge"
+      description: >
+        Assess the codebase against the current spec/plan/tasks and append any
+        remaining unbuilt work to tasks.md so nothing slips through between tasks.
+      enabled: true
+      optional: false
+
+  # Triggered by speckit-implement after ALL tasks under a user story heading are [X].
+  after_story:
+    - name: "analyze-on-story-complete"
+      command: "speckit.analyze"
+      description: >
+        Run a read-only cross-artifact consistency check (spec ↔ plan ↔ tasks)
+        once the full story is done, before moving to the next story.
+      enabled: true
+      optional: false
